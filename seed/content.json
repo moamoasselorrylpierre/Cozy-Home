@@ -1,0 +1,161 @@
+{
+  "site": {
+    "name": "Cozy Home by Fany",
+    "tagline": "Rideaux sur mesure & relooking d’intérieur",
+    "city": "",
+    "country": "Cameroun",
+    "whatsapp": "+237 673412103",
+    "email": "",
+    "address": "",
+    "hours": "Du lundi au samedi, sur rendez-vous",
+    "social": {
+      "tiktok": "https://www.tiktok.com/@cozyhomebyfany",
+      "instagram": "",
+      "facebook": "",
+      "messenger": ""
+    }
+  },
+  "seo": {
+    "home": {
+      "title": "Rideaux sur mesure & relooking d’intérieur {lieu} | Cozy Home by Fany",
+      "description": "Cozy Home by Fany confectionne vos rideaux sur mesure — voilages, occultants, tamisants, à œillets, brodés — et relooke vos espaces de vie {lieu}. Conseil personnalisé, pose et livraison."
+    },
+    "galerie": {
+      "title": "La Galerie — exposition des styles de rideaux | Cozy Home by Fany",
+      "description": "Traversez les salles de notre exposition : voilage, tamisant, occultant, œillets, plis pincés, brodé, bohème… Découvrez l’ambiance que crée chaque style de rideau."
+    },
+    "catalogue": {
+      "title": "Catalogue des tissus & rideaux sur mesure {lieu} | Cozy Home by Fany",
+      "description": "Tous nos motifs et tissus de rideaux : lin, velours, wax, bogolan, voile, jacquard… Filtrez par style, couleur, matière et pièce, puis commandez sur mesure."
+    },
+    "composer": {
+      "title": "Compose ton intérieur — atelier de visualisation | Cozy Home by Fany",
+      "description": "Choisissez une pièce, habillez sa fenêtre de nos rideaux, assortissez coussins et nappes, et visualisez le rendu en direct avant de demander votre devis."
+    },
+    "contact": {
+      "title": "Devis rideaux sur mesure & conseil déco {lieu} | Cozy Home by Fany",
+      "description": "Demandez un devis pour vos rideaux sur mesure ou un conseil pour relooker votre intérieur. Réponse rapide sur WhatsApp."
+    },
+    "atelier": {
+      "title": "L’Atelier — l’histoire de Fany | Cozy Home by Fany",
+      "description": "Plus qu’un rideau, une ambiance : découvrez l’atelier Cozy Home, le savoir-faire artisanal de Fany et sa passion pour le relooking d’intérieur."
+    },
+    "modele": {
+      "title": "",
+      "description": ""
+    },
+    "commande": {
+      "title": "",
+      "description": ""
+    },
+    "confidentialite": {
+      "title": "Confidentialité | Cozy Home by Fany",
+      "description": "Comment Cozy Home by Fany utilise les informations transmises via le site."
+    },
+    "planDuSite": {
+      "title": "Plan du site | Cozy Home by Fany",
+      "description": "Toutes les pages du site Cozy Home by Fany."
+    }
+  },
+  "home": {
+    "heroKicker": "Atelier de rideaux sur mesure",
+    "heroTitle": "Plus qu’un rideau,\nune ambiance.",
+    "heroText": "Voilages aériens, velours profonds, wax éclatants : chaque pièce est coupée, cousue et posée pour votre fenêtre — et pour la lumière que vous aimez.",
+    "heroImage": "/img/site/hero.webp",
+    "heroCtaPrimary": "Visiter la galerie",
+    "heroCtaSecondary": "Demander un devis",
+    "featuredKicker": "Nouvelle collection",
+    "featuredTitle": "Motifs à la une",
+    "featuredText": "Nos pièces de collection, présentées telles qu’elles vivront chez vous : coupées, plissées et suspendues à leur tringle.",
+    "servicesKicker": "Savoir-faire",
+    "servicesTitle": "Deux façons d’habiter la lumière",
+    "services": [
+      {
+        "title": "Rideaux sur mesure",
+        "text": "Prise de mesures, choix de la matière, du type de pose et de la finition : votre rideau est confectionné à l’atelier pour tomber juste, du rail jusqu’au sol.",
+        "image": "/img/site/service-rideaux.webp",
+        "cta": "Parcourir le catalogue",
+        "link": "/catalogue"
+      },
+      {
+        "title": "Relooking d’espace complet",
+        "text": "Rideaux, coussins, nappes, linge de maison et agencement : Fany compose une ambiance cohérente, pièce par pièce, à partir de ce que vous aimez déjà.",
+        "image": "/img/site/service-relooking.webp",
+        "cta": "Composer mon intérieur",
+        "link": "/composer"
+      }
+    ],
+    "reassurance": [
+      { "title": "Fait main", "text": "Chaque pièce est coupée et cousue à l’atelier." },
+      { "title": "Sur mesure", "text": "Aux dimensions exactes de vos fenêtres." },
+      { "title": "Livraison & pose", "text": "Nous livrons et installons vos rideaux." },
+      { "title": "Conseil personnalisé", "text": "Un accompagnement sur WhatsApp, du choix à la pose." }
+    ],
+    "composerKicker": "Atelier de visualisation",
+    "composerTitle": "Compose ton intérieur",
+    "composerText": "Choisissez une pièce, habillez sa fenêtre, assortissez coussins et nappe : le rendu se dessine sous vos yeux. Votre composition devient ensuite la base de votre devis.",
+    "tiktokKicker": "Dans les coulisses",
+    "tiktokTitle": "L’atelier en mouvement",
+    "tiktokText": "Poses, avant/après, relookings complets : suivez les créations de Fany au fil des jours sur TikTok.",
+    "tiktokVideos": [
+      { "url": "", "caption": "" }
+    ]
+  },
+  "galerie": {
+    "introKicker": "Exposition permanente",
+    "introTitle": "La Galerie",
+    "introText": "Huit salles, huit manières d’habiller une fenêtre. Avancez de salle en salle, effleurez les tissus, observez la lumière changer : chaque style raconte une ambiance.",
+    "outroTitle": "Votre style se dessine ?",
+    "outroText": "Retrouvez tous les modèles au catalogue, ou composez directement votre intérieur."
+  },
+  "catalogue": {
+    "kicker": "Les collections",
+    "title": "Catalogue",
+    "intro": "Chaque tissu est présenté monté et drapé, tel qu’il habillera votre fenêtre. Affinez par style, couleur, matière ou pièce de la maison."
+  },
+  "composer": {
+    "kicker": "Atelier de visualisation",
+    "title": "Compose ton intérieur",
+    "intro": "Choisissez une pièce, associez-lui nos rideaux, ajustez la pose et assortissez coussins et linge de maison. Quand la composition vous plaît, envoyez-la à Fany comme base de devis."
+  },
+  "contact": {
+    "kicker": "Parlons de votre projet",
+    "title": "Contact & devis",
+    "intro": "Un projet précis, une simple envie ou une question ? Choisissez la demande qui vous ressemble : Fany vous répond personnellement, le plus souvent sur WhatsApp.",
+    "quoteIntro": "Décrivez votre fenêtre et votre pièce : vous recevrez une proposition chiffrée et des suggestions de tissus.",
+    "adviceIntro": "Vous ne savez pas encore ce que vous voulez ? C’est le meilleur moment pour en parler. Quelques mots suffisent.",
+    "orderIntro": "Votre modèle est choisi : indiquez vos dimensions, nous confirmons tout avec vous avant la confection.",
+    "thanks": "Merci ! Votre demande est bien arrivée à l’atelier. Fany revient vers vous très vite."
+  },
+  "atelier": {
+    "kicker": "L’Atelier",
+    "title": "Plus qu’un rideau, une ambiance",
+    "intro": "Derrière Cozy Home, il y a Fany : une maman entrepreneure qui a fait de sa passion pour les intérieurs chaleureux un atelier de confection.",
+    "portrait": "",
+    "portraitCaption": "Fany, fondatrice de Cozy Home",
+    "storyTitle": "Une histoire de maison",
+    "story": "Tout a commencé à la maison, avec l’envie de transformer des pièces ordinaires en lieux où l’on se sent bien. Un rideau change la lumière ; la lumière change l’humeur d’une pièce.\n\nDe cette conviction est né Cozy Home by Fany : un atelier où chaque rideau est pensé pour une fenêtre, une pièce, une famille. Voilages, occultants, pièces brodées ou bohèmes — et, lorsque l’envie est plus grande, le relooking complet d’un espace de vie.\n\nEntre deux coutures, Fany partage son quotidien d’atelier sur TikTok : les poses, les avant/après, les petites victoires d’une entreprise construite avec cœur.",
+    "quote": "Un intérieur réussi, c’est d’abord une lumière qui vous ressemble.",
+    "valuesTitle": "Le savoir-faire",
+    "values": [
+      { "title": "La main", "text": "Coupe, assemblage, ourlets et finitions : chaque pièce est façonnée à l’atelier, avec le soin d’une confection sur mesure." },
+      { "title": "La matière", "text": "Lin, velours, voile, wax, bogolan : des tissus choisis pour leur tombé, leur toucher et la façon dont ils accueillent la lumière." },
+      { "title": "L’ensemble", "text": "Rideaux, coussins, nappes, linge de maison : Fany relooke des espaces entiers pour qu’ils racontent une seule et même histoire." }
+    ],
+    "galleryTitle": "Compositions de l’atelier",
+    "gallery": [
+      { "image": "/img/site/atelier-1.webp", "caption": "Salon bohème, voilage brodé" },
+      { "image": "/img/site/atelier-2.webp", "caption": "Chambre cosy, velours et lin" },
+      { "image": "/img/site/atelier-3.webp", "caption": "Salle à manger, toile de Jouy" },
+      { "image": "/img/site/atelier-4.webp", "caption": "Afrique contemporaine, wax et bogolan" }
+    ],
+    "relookingTitle": "Relooker un espace entier",
+    "relookingText": "Au-delà du rideau, Fany imagine l’ensemble : harmonie des couleurs, textiles assortis, disposition, petits objets. Un regard neuf sur votre pièce, et un résultat qui vous ressemble.",
+    "ctaTitle": "Et si l’on parlait de votre intérieur ?",
+    "ctaText": "Écrivez à Fany : elle vous répond personnellement."
+  },
+  "legal": {
+    "privacyTitle": "Confidentialité",
+    "privacy": "Les informations transmises via les formulaires du site (nom, coordonnées, dimensions, composition) sont utilisées uniquement par Cozy Home by Fany pour répondre à votre demande, établir un devis ou traiter votre commande. Elles ne sont ni vendues ni cédées à des tiers.\n\nVous pouvez à tout moment demander la consultation, la correction ou la suppression de vos informations en écrivant à Fany sur WhatsApp.\n\nLe site n’utilise pas de cookie publicitaire ni de traceur de mesure d’audience. Un cookie technique est utilisé uniquement pour l’espace réservé à l’équipe de l’atelier. Les vidéos TikTok ne sont chargées que si vous cliquez pour les lire."
+  }
+}

@@ -1,0 +1,1192 @@
+[
+  {
+    "id": "mod_demo01",
+    "slug": "voile-ivoire",
+    "name": "Voile Ivoire",
+    "style": "voilage",
+    "description": "Un voile de coton d’une grande finesse qui adoucit la lumière du jour et floute délicatement le dehors.",
+    "material": "voile",
+    "rooms": [
+      "salon",
+      "chambre",
+      "salle-a-manger"
+    ],
+    "colorFamilies": [
+      "blanc",
+      "jaune"
+    ],
+    "colors": [
+      {
+        "hex": "#F2ECE1",
+        "name": "Ivoire",
+        "weight": 0.805
+      },
+      {
+        "hex": "#FDFAF0",
+        "name": "Ivoire",
+        "weight": 0.118
+      },
+      {
+        "hex": "#E3DDD3",
+        "name": "Écru",
+        "weight": 0.078
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 6500,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": true,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "rod",
+      "finish": "sheer",
+      "opacity": 0.3,
+      "hem": "plain",
+      "tileCm": 30
+    },
+    "images": {
+      "original": "/img/fabrics/voile-ivoire-echantillon.webp",
+      "swatch": "/img/fabrics/voile-ivoire.webp",
+      "mockups": {
+        "ferme": "/img/mockups/voile-ivoire-ferme.webp",
+        "miOuvert": "/img/mockups/voile-ivoire-mi-ouvert.webp",
+        "embrasse": "/img/mockups/voile-ivoire-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/voile-ivoire-ferme-480.webp",
+        "miOuvert": "/img/mockups/voile-ivoire-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/voile-ivoire-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "texture",
+      "stripes": null,
+      "brightness": 0.848,
+      "contrast": 0.259
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo02",
+    "slug": "gaze-rose-poudre",
+    "name": "Gaze Rose Poudré",
+    "style": "voilage",
+    "description": "Une gaze de coton froissée, rose poudré, pour une lumière tendre et un tombé naturellement bohème.",
+    "material": "gaze",
+    "rooms": [
+      "chambre",
+      "chambre-enfant"
+    ],
+    "colorFamilies": [
+      "rose",
+      "rouge"
+    ],
+    "colors": [
+      {
+        "hex": "#E8CAC1",
+        "name": "Rose poudré",
+        "weight": 0.265
+      },
+      {
+        "hex": "#D8B8B0",
+        "name": "Grège",
+        "weight": 0.256
+      },
+      {
+        "hex": "#F6DBD2",
+        "name": "Écru",
+        "weight": 0.212
+      },
+      {
+        "hex": "#C6A39C",
+        "name": "Grège",
+        "weight": 0.144
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 7000,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": false,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "rod",
+      "finish": "sheer",
+      "opacity": 0.42,
+      "hem": "plain",
+      "tileCm": 30
+    },
+    "images": {
+      "original": "/img/fabrics/gaze-rose-poudre-echantillon.webp",
+      "swatch": "/img/fabrics/gaze-rose-poudre.webp",
+      "mockups": {
+        "ferme": "/img/mockups/gaze-rose-poudre-ferme.webp",
+        "miOuvert": "/img/mockups/gaze-rose-poudre-mi-ouvert.webp",
+        "embrasse": "/img/mockups/gaze-rose-poudre-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/gaze-rose-poudre-ferme-480.webp",
+        "miOuvert": "/img/mockups/gaze-rose-poudre-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/gaze-rose-poudre-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.63,
+      "contrast": 0.605
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo03",
+    "slug": "velours-sapin",
+    "name": "Velours Sapin",
+    "style": "occultant",
+    "description": "Un velours vert sapin profond aux reflets changeants, doublé occultant : la nuit en plein jour, avec panache.",
+    "material": "velours",
+    "rooms": [
+      "salon",
+      "chambre"
+    ],
+    "colorFamilies": [
+      "vert"
+    ],
+    "colors": [
+      {
+        "hex": "#2E493D",
+        "name": "Vert sapin",
+        "weight": 1
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 14500,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": true,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "pinch",
+      "finish": "velvet",
+      "opacity": 1,
+      "hem": "plain",
+      "tileCm": 30
+    },
+    "images": {
+      "original": "/img/fabrics/velours-sapin-echantillon.webp",
+      "swatch": "/img/fabrics/velours-sapin.webp",
+      "mockups": {
+        "ferme": "/img/mockups/velours-sapin-ferme.webp",
+        "miOuvert": "/img/mockups/velours-sapin-mi-ouvert.webp",
+        "embrasse": "/img/mockups/velours-sapin-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/velours-sapin-ferme-480.webp",
+        "miOuvert": "/img/mockups/velours-sapin-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/velours-sapin-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "uni",
+      "stripes": null,
+      "brightness": 0.058,
+      "contrast": 0.025
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo04",
+    "slug": "velours-terracotta",
+    "name": "Velours Terracotta",
+    "style": "occultant",
+    "description": "La chaleur d’une terre cuite dans un velours dense et soyeux, qui isole de la lumière comme de la chaleur.",
+    "material": "velours",
+    "rooms": [
+      "salon",
+      "chambre",
+      "bureau"
+    ],
+    "colorFamilies": [
+      "terracotta"
+    ],
+    "colors": [
+      {
+        "hex": "#AC573D",
+        "name": "Brique",
+        "weight": 1
+      }
+    ],
+    "availability": "sur-commande",
+    "price": {
+      "amount": 14500,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": false,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "eyelet",
+      "finish": "velvet",
+      "opacity": 1,
+      "hem": "plain",
+      "tileCm": 30
+    },
+    "images": {
+      "original": "/img/fabrics/velours-terracotta-echantillon.webp",
+      "swatch": "/img/fabrics/velours-terracotta.webp",
+      "mockups": {
+        "ferme": "/img/mockups/velours-terracotta-ferme.webp",
+        "miOuvert": "/img/mockups/velours-terracotta-mi-ouvert.webp",
+        "embrasse": "/img/mockups/velours-terracotta-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/velours-terracotta-ferme-480.webp",
+        "miOuvert": "/img/mockups/velours-terracotta-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/velours-terracotta-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "uni",
+      "stripes": null,
+      "brightness": 0.152,
+      "contrast": 0.055
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo05",
+    "slug": "lin-sable",
+    "name": "Lin Sable",
+    "style": "tamisant",
+    "description": "Un lin naturel aux flammes irrégulières, couleur sable, qui tamise la lumière en un halo doré.",
+    "material": "lin",
+    "rooms": [
+      "salon",
+      "chambre",
+      "bureau"
+    ],
+    "colorFamilies": [
+      "beige",
+      "jaune"
+    ],
+    "colors": [
+      {
+        "hex": "#D1BE9D",
+        "name": "Sable",
+        "weight": 0.331
+      },
+      {
+        "hex": "#E7D4B0",
+        "name": "Lin",
+        "weight": 0.28
+      },
+      {
+        "hex": "#B7A688",
+        "name": "Or pâle",
+        "weight": 0.204
+      },
+      {
+        "hex": "#FAEDC7",
+        "name": "Écru",
+        "weight": 0.138
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 9500,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": true,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "tab",
+      "finish": "matte",
+      "opacity": 0.78,
+      "hem": "plain",
+      "tileCm": 30
+    },
+    "images": {
+      "original": "/img/fabrics/lin-sable-echantillon.webp",
+      "swatch": "/img/fabrics/lin-sable.webp",
+      "mockups": {
+        "ferme": "/img/mockups/lin-sable-ferme.webp",
+        "miOuvert": "/img/mockups/lin-sable-mi-ouvert.webp",
+        "embrasse": "/img/mockups/lin-sable-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/lin-sable-ferme-480.webp",
+        "miOuvert": "/img/mockups/lin-sable-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/lin-sable-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.572,
+      "contrast": 0.673
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo06",
+    "slug": "bogolan-nuit",
+    "name": "Bogolan Nuit",
+    "style": "tamisant",
+    "description": "Les symboles peints du bogolan, ivoire sur brun profond : un tissu à forte personnalité, tissé et peint à la main.",
+    "material": "coton",
+    "rooms": [
+      "salon",
+      "bureau"
+    ],
+    "colorFamilies": [
+      "noir",
+      "marron",
+      "beige"
+    ],
+    "colors": [
+      {
+        "hex": "#30241D",
+        "name": "Anthracite",
+        "weight": 0.488
+      },
+      {
+        "hex": "#41332A",
+        "name": "Chocolat",
+        "weight": 0.266
+      },
+      {
+        "hex": "#BEAE95",
+        "name": "Grège",
+        "weight": 0.095
+      },
+      {
+        "hex": "#E8DABE",
+        "name": "Lin",
+        "weight": 0.089
+      }
+    ],
+    "availability": "sur-commande",
+    "price": {
+      "amount": 12000,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": false,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "eyelet",
+      "finish": "matte",
+      "opacity": 0.9,
+      "hem": "plain",
+      "tileCm": 34
+    },
+    "images": {
+      "original": "/img/fabrics/bogolan-nuit-echantillon.webp",
+      "swatch": "/img/fabrics/bogolan-nuit.webp",
+      "mockups": {
+        "ferme": "/img/mockups/bogolan-nuit-ferme.webp",
+        "miOuvert": "/img/mockups/bogolan-nuit-mi-ouvert.webp",
+        "embrasse": "/img/mockups/bogolan-nuit-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/bogolan-nuit-ferme-480.webp",
+        "miOuvert": "/img/mockups/bogolan-nuit-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/bogolan-nuit-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.137,
+      "contrast": 0.893
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo07",
+    "slug": "rayure-riviera",
+    "name": "Rayure Riviera",
+    "style": "oeillets",
+    "description": "Des rayures sable et ivoire rehaussées d’un filet vert sapin : l’esprit des maisons de bord de mer.",
+    "material": "coton",
+    "rooms": [
+      "salon",
+      "cuisine",
+      "chambre-enfant"
+    ],
+    "colorFamilies": [
+      "beige",
+      "blanc"
+    ],
+    "colors": [
+      {
+        "hex": "#DBD1BE",
+        "name": "Lin",
+        "weight": 0.306
+      },
+      {
+        "hex": "#EBE3D2",
+        "name": "Écru",
+        "weight": 0.272
+      },
+      {
+        "hex": "#CBBEA6",
+        "name": "Grège",
+        "weight": 0.252
+      },
+      {
+        "hex": "#B6AB94",
+        "name": "Vert sauge",
+        "weight": 0.121
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 8000,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": false,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "eyelet",
+      "finish": "matte",
+      "opacity": 0.92,
+      "hem": "plain",
+      "tileCm": 30
+    },
+    "images": {
+      "original": "/img/fabrics/rayure-riviera-echantillon.webp",
+      "swatch": "/img/fabrics/rayure-riviera.webp",
+      "mockups": {
+        "ferme": "/img/mockups/rayure-riviera-ferme.webp",
+        "miOuvert": "/img/mockups/rayure-riviera-mi-ouvert.webp",
+        "embrasse": "/img/mockups/rayure-riviera-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/rayure-riviera-ferme-480.webp",
+        "miOuvert": "/img/mockups/rayure-riviera-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/rayure-riviera-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.602,
+      "contrast": 0.588
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo08",
+    "slug": "wax-soleil",
+    "name": "Wax Soleil",
+    "style": "oeillets",
+    "description": "Un wax éclatant aux soleils concentriques ocre, terracotta et bleu canard, monté sur œillets pour des plis réguliers.",
+    "material": "wax",
+    "rooms": [
+      "salon",
+      "salle-a-manger",
+      "chambre-enfant"
+    ],
+    "colorFamilies": [
+      "jaune",
+      "bleu",
+      "beige"
+    ],
+    "colors": [
+      {
+        "hex": "#EFE6CE",
+        "name": "Écru",
+        "weight": 0.52
+      },
+      {
+        "hex": "#2B5B63",
+        "name": "Bleu canard",
+        "weight": 0.172
+      },
+      {
+        "hex": "#D09B34",
+        "name": "Moutarde",
+        "weight": 0.109
+      },
+      {
+        "hex": "#C3BCA6",
+        "name": "Grège",
+        "weight": 0.107
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 7500,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": true,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "eyelet",
+      "finish": "matte",
+      "opacity": 0.96,
+      "hem": "plain",
+      "tileCm": 36
+    },
+    "images": {
+      "original": "/img/fabrics/wax-soleil-echantillon.webp",
+      "swatch": "/img/fabrics/wax-soleil.webp",
+      "mockups": {
+        "ferme": "/img/mockups/wax-soleil-ferme.webp",
+        "miOuvert": "/img/mockups/wax-soleil-mi-ouvert.webp",
+        "embrasse": "/img/mockups/wax-soleil-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/wax-soleil-ferme-480.webp",
+        "miOuvert": "/img/mockups/wax-soleil-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/wax-soleil-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.542,
+      "contrast": 1
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo09",
+    "slug": "toile-de-jouy-brique",
+    "name": "Toile de Jouy Brique",
+    "style": "plis-pinces",
+    "description": "Scènes pastorales gravées au trait, couleur brique sur fond écru : un classique intemporel, monté en plis pincés.",
+    "material": "coton",
+    "rooms": [
+      "salle-a-manger",
+      "chambre"
+    ],
+    "colorFamilies": [
+      "jaune",
+      "beige"
+    ],
+    "colors": [
+      {
+        "hex": "#F6EEDF",
+        "name": "Ivoire",
+        "weight": 0.489
+      },
+      {
+        "hex": "#E7DDCE",
+        "name": "Écru",
+        "weight": 0.314
+      },
+      {
+        "hex": "#DABAA7",
+        "name": "Sable",
+        "weight": 0.087
+      },
+      {
+        "hex": "#CE9D87",
+        "name": "Vieux rose",
+        "weight": 0.073
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 11000,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": false,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "pinch",
+      "finish": "matte",
+      "opacity": 0.95,
+      "hem": "plain",
+      "tileCm": 40
+    },
+    "images": {
+      "original": "/img/fabrics/toile-de-jouy-brique-echantillon.webp",
+      "swatch": "/img/fabrics/toile-de-jouy-brique.webp",
+      "mockups": {
+        "ferme": "/img/mockups/toile-de-jouy-brique-ferme.webp",
+        "miOuvert": "/img/mockups/toile-de-jouy-brique-mi-ouvert.webp",
+        "embrasse": "/img/mockups/toile-de-jouy-brique-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/toile-de-jouy-brique-ferme-480.webp",
+        "miOuvert": "/img/mockups/toile-de-jouy-brique-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/toile-de-jouy-brique-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.737,
+      "contrast": 0.696
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo10",
+    "slug": "damas-or",
+    "name": "Damas Or",
+    "style": "plis-pinces",
+    "description": "Médaillons baroques tissés ton sur ton, champagne et or, dont le satin s’illumine au passage de la lumière.",
+    "material": "jacquard",
+    "rooms": [
+      "salon",
+      "salle-a-manger"
+    ],
+    "colorFamilies": [
+      "beige"
+    ],
+    "colors": [
+      {
+        "hex": "#B7975A",
+        "name": "Doré antique",
+        "weight": 0.811
+      },
+      {
+        "hex": "#C7AE79",
+        "name": "Or pâle",
+        "weight": 0.189
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 16000,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": true,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "pinch",
+      "finish": "satin",
+      "opacity": 0.98,
+      "hem": "plain",
+      "tileCm": 38
+    },
+    "images": {
+      "original": "/img/fabrics/damas-or-echantillon.webp",
+      "swatch": "/img/fabrics/damas-or.webp",
+      "mockups": {
+        "ferme": "/img/mockups/damas-or-ferme.webp",
+        "miOuvert": "/img/mockups/damas-or-mi-ouvert.webp",
+        "embrasse": "/img/mockups/damas-or-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/damas-or-ferme-480.webp",
+        "miOuvert": "/img/mockups/damas-or-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/damas-or-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "texture",
+      "stripes": null,
+      "brightness": 0.35,
+      "contrast": 0.174
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo11",
+    "slug": "broderie-camelia",
+    "name": "Broderie Camélia",
+    "style": "brode",
+    "description": "Camélias et feuillages brodés en relief sur un coton ivoire : à contre-jour, la broderie se dessine comme une dentelle.",
+    "material": "coton",
+    "rooms": [
+      "salle-a-manger",
+      "chambre",
+      "salon"
+    ],
+    "colorFamilies": [
+      "blanc",
+      "beige"
+    ],
+    "colors": [
+      {
+        "hex": "#F5F0E2",
+        "name": "Ivoire",
+        "weight": 0.418
+      },
+      {
+        "hex": "#E5DED0",
+        "name": "Écru",
+        "weight": 0.401
+      },
+      {
+        "hex": "#D2CAB8",
+        "name": "Gris perle",
+        "weight": 0.108
+      },
+      {
+        "hex": "#BCAF90",
+        "name": "Or pâle",
+        "weight": 0.053
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 13500,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": true,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "rod",
+      "finish": "matte",
+      "opacity": 0.62,
+      "hem": "plain",
+      "tileCm": 32
+    },
+    "images": {
+      "original": "/img/fabrics/broderie-camelia-echantillon.webp",
+      "swatch": "/img/fabrics/broderie-camelia.webp",
+      "mockups": {
+        "ferme": "/img/mockups/broderie-camelia-ferme.webp",
+        "miOuvert": "/img/mockups/broderie-camelia-mi-ouvert.webp",
+        "embrasse": "/img/mockups/broderie-camelia-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/broderie-camelia-ferme-480.webp",
+        "miOuvert": "/img/mockups/broderie-camelia-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/broderie-camelia-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.753,
+      "contrast": 0.572
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo12",
+    "slug": "voile-brode-plumetis",
+    "name": "Voile Plumetis",
+    "style": "brode",
+    "description": "Un voile ivoire semé de petits pois brodés en plumetis : léger, romantique, délicatement graphique.",
+    "material": "voile",
+    "rooms": [
+      "chambre",
+      "chambre-enfant",
+      "salon"
+    ],
+    "colorFamilies": [
+      "blanc",
+      "beige"
+    ],
+    "colors": [
+      {
+        "hex": "#EEE6D6",
+        "name": "Écru",
+        "weight": 0.872
+      },
+      {
+        "hex": "#D7D0C2",
+        "name": "Lin",
+        "weight": 0.105
+      },
+      {
+        "hex": "#C5BEB1",
+        "name": "Grège",
+        "weight": 0.023
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 8500,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": false,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "rod",
+      "finish": "sheer",
+      "opacity": 0.4,
+      "hem": "plain",
+      "tileCm": 28
+    },
+    "images": {
+      "original": "/img/fabrics/voile-brode-plumetis-echantillon.webp",
+      "swatch": "/img/fabrics/voile-brode-plumetis.webp",
+      "mockups": {
+        "ferme": "/img/mockups/voile-brode-plumetis-ferme.webp",
+        "miOuvert": "/img/mockups/voile-brode-plumetis-mi-ouvert.webp",
+        "embrasse": "/img/mockups/voile-brode-plumetis-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/voile-brode-plumetis-ferme-480.webp",
+        "miOuvert": "/img/mockups/voile-brode-plumetis-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/voile-brode-plumetis-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.782,
+      "contrast": 0.384
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo13",
+    "slug": "macrame-naturel",
+    "name": "Macramé Naturel",
+    "style": "boheme",
+    "description": "Un rideau de cordon de coton noué main, en losanges ajourés, terminé par des franges qui dansent.",
+    "material": "macrame",
+    "rooms": [
+      "salon",
+      "chambre"
+    ],
+    "colorFamilies": [
+      "jaune",
+      "beige",
+      "marron"
+    ],
+    "colors": [
+      {
+        "hex": "#706456",
+        "name": "Taupe foncé",
+        "weight": 0.612
+      },
+      {
+        "hex": "#F8F3E4",
+        "name": "Ivoire",
+        "weight": 0.125
+      },
+      {
+        "hex": "#D8CDB6",
+        "name": "Lin",
+        "weight": 0.106
+      },
+      {
+        "hex": "#4B4339",
+        "name": "Vert sapin",
+        "weight": 0.09
+      }
+    ],
+    "availability": "sur-commande",
+    "price": {
+      "amount": 45000,
+      "unit": "panneau",
+      "currency": "XAF"
+    },
+    "featured": false,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "tab",
+      "finish": "matte",
+      "opacity": 0.8,
+      "hem": "fringe",
+      "tileCm": 26
+    },
+    "images": {
+      "original": "/img/fabrics/macrame-naturel-echantillon.webp",
+      "swatch": "/img/fabrics/macrame-naturel.webp",
+      "mockups": {
+        "ferme": "/img/mockups/macrame-naturel-ferme.webp",
+        "miOuvert": "/img/mockups/macrame-naturel-mi-ouvert.webp",
+        "embrasse": "/img/mockups/macrame-naturel-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/macrame-naturel-ferme-480.webp",
+        "miOuvert": "/img/mockups/macrame-naturel-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/macrame-naturel-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.29,
+      "contrast": 1
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo14",
+    "slug": "ikat-terre",
+    "name": "Ikat Terre",
+    "style": "boheme",
+    "description": "Losanges aux contours flammés, brique, ocre et indigo : un ikat solaire à l’âme voyageuse.",
+    "material": "coton",
+    "rooms": [
+      "salon",
+      "bureau",
+      "chambre"
+    ],
+    "colorFamilies": [
+      "beige",
+      "terracotta",
+      "gris"
+    ],
+    "colors": [
+      {
+        "hex": "#E0D6C0",
+        "name": "Lin",
+        "weight": 0.315
+      },
+      {
+        "hex": "#CABDA7",
+        "name": "Grège",
+        "weight": 0.263
+      },
+      {
+        "hex": "#B39C81",
+        "name": "Vieux rose",
+        "weight": 0.199
+      },
+      {
+        "hex": "#A77254",
+        "name": "Caramel",
+        "weight": 0.114
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 9000,
+      "unit": "metre",
+      "currency": "XAF"
+    },
+    "featured": false,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "tab",
+      "finish": "matte",
+      "opacity": 0.9,
+      "hem": "fringe",
+      "tileCm": 34
+    },
+    "images": {
+      "original": "/img/fabrics/ikat-terre-echantillon.webp",
+      "swatch": "/img/fabrics/ikat-terre.webp",
+      "mockups": {
+        "ferme": "/img/mockups/ikat-terre-ferme.webp",
+        "miOuvert": "/img/mockups/ikat-terre-mi-ouvert.webp",
+        "embrasse": "/img/mockups/ikat-terre-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/ikat-terre-ferme-480.webp",
+        "miOuvert": "/img/mockups/ikat-terre-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/ikat-terre-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.459,
+      "contrast": 0.797
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo15",
+    "slug": "zellige-azur",
+    "name": "Zellige Azur",
+    "style": "douche",
+    "description": "Étoiles et croisillons de zellige bleu majorelle sur une toile déperlante : la fraîcheur d’un riad dans votre salle de bain.",
+    "material": "polyester",
+    "rooms": [
+      "salle-de-bain"
+    ],
+    "colorFamilies": [
+      "bleu",
+      "blanc"
+    ],
+    "colors": [
+      {
+        "hex": "#3D52B8",
+        "name": "Bleu majorelle",
+        "weight": 0.424
+      },
+      {
+        "hex": "#E6E4DD",
+        "name": "Blanc cassé",
+        "weight": 0.247
+      },
+      {
+        "hex": "#1E2D65",
+        "name": "Bleu nuit",
+        "weight": 0.152
+      },
+      {
+        "hex": "#415093",
+        "name": "Bleu majorelle",
+        "weight": 0.101
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 18000,
+      "unit": "panneau",
+      "currency": "XAF"
+    },
+    "featured": false,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "rings",
+      "finish": "matte",
+      "opacity": 1,
+      "hem": "plain",
+      "tileCm": 30
+    },
+    "images": {
+      "original": "/img/fabrics/zellige-azur-echantillon.webp",
+      "swatch": "/img/fabrics/zellige-azur.webp",
+      "mockups": {
+        "ferme": "/img/mockups/zellige-azur-ferme.webp",
+        "miOuvert": "/img/mockups/zellige-azur-mi-ouvert.webp",
+        "embrasse": "/img/mockups/zellige-azur-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/zellige-azur-ferme-480.webp",
+        "miOuvert": "/img/mockups/zellige-azur-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/zellige-azur-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.286,
+      "contrast": 1
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  },
+  {
+    "id": "mod_demo16",
+    "slug": "palmes-tropicales",
+    "name": "Palmes Tropicales",
+    "style": "douche",
+    "description": "De grandes feuilles de bananier vert profond sur fond crème : une salle de bain qui respire la nature.",
+    "material": "polyester",
+    "rooms": [
+      "salle-de-bain"
+    ],
+    "colorFamilies": [
+      "blanc",
+      "vert",
+      "gris"
+    ],
+    "colors": [
+      {
+        "hex": "#EFE9DA",
+        "name": "Blanc cassé",
+        "weight": 0.396
+      },
+      {
+        "hex": "#34604B",
+        "name": "Vert émeraude",
+        "weight": 0.167
+      },
+      {
+        "hex": "#254C3A",
+        "name": "Vert sapin",
+        "weight": 0.166
+      },
+      {
+        "hex": "#869E85",
+        "name": "Vert sauge",
+        "weight": 0.155
+      }
+    ],
+    "availability": "disponible",
+    "price": {
+      "amount": 18000,
+      "unit": "panneau",
+      "currency": "XAF"
+    },
+    "featured": false,
+    "status": "published",
+    "render": {
+      "wrap": "repeat",
+      "heading": "rings",
+      "finish": "matte",
+      "opacity": 1,
+      "hem": "plain",
+      "tileCm": 44
+    },
+    "images": {
+      "original": "/img/fabrics/palmes-tropicales-echantillon.webp",
+      "swatch": "/img/fabrics/palmes-tropicales.webp",
+      "mockups": {
+        "ferme": "/img/mockups/palmes-tropicales-ferme.webp",
+        "miOuvert": "/img/mockups/palmes-tropicales-mi-ouvert.webp",
+        "embrasse": "/img/mockups/palmes-tropicales-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/palmes-tropicales-ferme-480.webp",
+        "miOuvert": "/img/mockups/palmes-tropicales-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/palmes-tropicales-embrasse-480.webp"
+      }
+    },
+    "analysis": {
+      "pattern": "motif",
+      "stripes": null,
+      "brightness": 0.455,
+      "contrast": 1
+    },
+    "demo": true,
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
+  }
+]

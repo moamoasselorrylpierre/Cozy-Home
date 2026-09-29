@@ -1,0 +1,30 @@
+{
+  // Configuration Cloudflare Workers de Cozy Home by Fany.
+  // D1 (données) et R2 (images) sont créés automatiquement au premier déploiement.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cozy-home",
+  "main": "server/worker.js",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    // Fichiers statiques (css, js, images du site, polices) servis directement par Cloudflare.
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "cozy-home-db" }
+  ],
+  "r2_buckets": [
+    { "binding": "MEDIA" }
+  ],
+  // Les gabarits HTML sont intégrés au Worker sous forme de texte.
+  "rules": [
+    { "type": "Text", "globs": ["**/*.html"], "fallthrough": true }
+  ],
+  "vars": {
+    // Identifiant du compte de Fany (le mot de passe est un secret : ADMIN_PASSWORD).
+    "ADMIN_USER": "fany"
+  },
+  // Les variables ajoutées dans le tableau de bord Cloudflare (ex. SITE_URL) sont conservées à chaque déploiement.
+  "keep_vars": true,
+  "observability": { "enabled": true }
+}

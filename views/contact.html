@@ -1,0 +1,125 @@
+{{> head }}
+{{> header }}
+<header class="page-head container">
+  <nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a><span aria-hidden="true">/</span>Contact</nav>
+  <p class="kicker">{{ contact.kicker }}</p>
+  <h1>{{ contact.title }}</h1>
+  <p class="lead">{{ contact.intro }}</p>
+</header>
+
+<section class="container contact-layout" style="padding-bottom:var(--section)">
+  <div data-contact>
+    <div class="tabs" role="tablist" aria-label="Type de demande">
+      <button type="button" role="tab" id="tab-devis" aria-controls="panel-devis" aria-selected="true" data-tab="devis">Demande de devis</button>
+      <button type="button" role="tab" id="tab-conseil" aria-controls="panel-conseil" aria-selected="false" data-tab="conseil" tabindex="-1">Demande de conseil</button>
+      <button type="button" role="tab" id="tab-commande" aria-controls="panel-commande" aria-selected="false" data-tab="commande" tabindex="-1">Commander un modèle</button>
+    </div>
+
+    <!-- Devis -->
+    <div role="tabpanel" id="panel-devis" aria-labelledby="tab-devis" data-panel="devis">
+      <p class="lead" style="font-size:1.05rem">{{ contact.quoteIntro }}</p>
+      <form class="form" data-form="devis" novalidate>
+        <div class="composition-attach" data-composition hidden>
+          <img alt="Votre composition" data-composition-img>
+          <p data-composition-text></p>
+          <button class="chip" type="button" data-composition-remove>Retirer</button>
+        </div>
+        <fieldset class="field">
+          <legend>Votre projet</legend>
+          <div class="choice-grid">
+            <label class="choice"><input type="radio" name="projectType" value="rideaux" checked><span>Rideaux sur mesure</span></label>
+            <label class="choice"><input type="radio" name="projectType" value="relooking"><span>Relooking d’espace</span></label>
+            <label class="choice"><input type="radio" name="projectType" value="les-deux"><span>Les deux</span></label>
+          </div>
+        </fieldset>
+        <div class="form__row">
+          <label class="field"><span>Pièce</span>
+            <select class="select" name="room"><option value="">— Choisir —</option>{{#each rooms as r}}<option value="{{ r.id }}">{{ r.label }}</option>{{/each}}</select>
+          </label>
+          <label class="field"><span>Modèle qui vous plaît (facultatif)</span>
+            <select class="select" name="modelSlug"><option value="">— Aucun en particulier —</option>{{#each models as m}}<option value="{{ m.slug }}">{{ m.name }}</option>{{/each}}</select>
+          </label>
+        </div>
+        <div class="form__row form__row--3">
+          <label class="field"><span>Largeur fenêtre (cm)</span><input class="input" type="number" name="windowWidth" min="20" max="2000" inputmode="numeric" placeholder="ex. 160"></label>
+          <label class="field"><span>Hauteur (cm)</span><input class="input" type="number" name="windowHeight" min="20" max="2000" inputmode="numeric" placeholder="ex. 250"></label>
+          <label class="field"><span>Nombre de fenêtres</span><input class="input" type="number" name="windows" min="1" max="50" value="1" inputmode="numeric"></label>
+        </div>
+        <div class="form__row">
+          <label class="field"><span>Budget indicatif</span>
+            <select class="select" name="budget">
+              <option value="">— Je ne sais pas encore —</option>
+              <option>Moins de 50 000 FCFA</option>
+              <option>50 000 – 150 000 FCFA</option>
+              <option>150 000 – 300 000 FCFA</option>
+              <option>Plus de 300 000 FCFA</option>
+            </select>
+          </label>
+          <label class="field"><span>Échéance souhaitée</span><input class="input" type="text" name="deadline" maxlength="80" placeholder="ex. avant la fin du mois"></label>
+        </div>
+        <label class="field"><span>Votre message</span><textarea class="textarea" name="message" maxlength="3000" placeholder="Ambiance recherchée, contraintes, questions…"></textarea></label>
+        {{> contact-fields }}
+        <p class="form__error" data-error role="alert"></p>
+        <div class="btn-row"><button class="btn" type="submit">Envoyer ma demande de devis</button></div>
+      </form>
+    </div>
+
+    <!-- Conseil -->
+    <div role="tabpanel" id="panel-conseil" aria-labelledby="tab-conseil" data-panel="conseil" hidden>
+      <p class="lead" style="font-size:1.05rem">{{ contact.adviceIntro }}</p>
+      <form class="form" data-form="conseil" novalidate>
+        <label class="field"><span>Dites-nous tout</span><textarea class="textarea" name="message" required maxlength="3000" placeholder="« Mon salon manque de chaleur, je ne sais pas quelle couleur choisir… »"></textarea></label>
+        <label class="field"><span>Pièce concernée (facultatif)</span>
+          <select class="select" name="room"><option value="">— Choisir —</option>{{#each rooms as r}}<option value="{{ r.id }}">{{ r.label }}</option>{{/each}}</select>
+        </label>
+        {{> contact-fields }}
+        <p class="form__error" data-error role="alert"></p>
+        <div class="btn-row"><button class="btn" type="submit">Demander conseil à Fany</button></div>
+      </form>
+    </div>
+
+    <!-- Commande -->
+    <div role="tabpanel" id="panel-commande" aria-labelledby="tab-commande" data-panel="commande" hidden>
+      <p class="lead" style="font-size:1.05rem">{{ contact.orderIntro }}</p>
+      <form class="form" data-order-pick>
+        <label class="field"><span>Modèle à commander</span>
+          <select class="select" name="modelSlug" required><option value="">— Choisir un modèle —</option>{{#each models as m}}<option value="{{ m.slug }}">{{ m.name }}</option>{{/each}}</select>
+        </label>
+        <div class="btn-row"><button class="btn" type="submit">Continuer la commande</button><a class="link-arrow" href="/catalogue">Parcourir le catalogue <svg aria-hidden="true"><use href="#i-arrow"></use></svg></a></div>
+      </form>
+    </div>
+
+    <div class="form-success" data-success hidden tabindex="-1">
+      <svg aria-hidden="true"><use href="#i-check"></use></svg>
+      <h2 style="font-size:2rem">Demande envoyée</h2>
+      <p>{{ contact.thanks }}</p>
+      <p class="form__note">Référence : <strong data-reference></strong></p>
+      <div class="btn-row" style="justify-content:center"><a class="btn btn--wa" href="{{ wa.link }}" target="_blank" rel="noopener" data-success-wa><svg aria-hidden="true"><use href="#i-whatsapp"></use></svg>Prévenir Fany sur WhatsApp</a><a class="btn btn--ghost" href="/catalogue">Retour au catalogue</a></div>
+    </div>
+  </div>
+
+  <aside class="contact-aside">
+    <div class="contact-card">
+      <p class="kicker">Contact direct</p>
+      <h3>Écrire à Fany</h3>
+      <p class="form__note">La réponse la plus rapide : WhatsApp.</p>
+      <ul>
+        <li><a href="{{ wa.link }}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"></use></svg>{{ wa.number }}</a></li>
+        <li><a href="{{ site.social.tiktok }}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-tiktok"></use></svg>@cozyhomebyfany</a></li>
+        {{#if site.social.messenger}}<li><a href="{{ site.social.messenger }}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-facebook"></use></svg>Messenger</a></li>{{/if}}
+        {{#if site.email}}<li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>{{/if}}
+      </ul>
+      <a class="btn btn--wa" style="width:100%;margin-top:22px" href="{{ wa.link }}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"></use></svg>Discuter sur WhatsApp</a>
+    </div>
+    <div class="contact-card">
+      <p class="kicker">Bon à savoir</p>
+      <ul class="form__note" style="gap:8px">
+        <li>{{ site.hours }}</li>
+        <li>Prise de mesures et conseil à domicile sur rendez-vous.</li>
+        <li>Composez d’abord votre pièce dans <a href="/composer">l’atelier de visualisation</a> : elle sera jointe à votre devis.</li>
+      </ul>
+    </div>
+  </aside>
+</section>
+<script type="application/json" id="page-data">{{{ pageData }}}</script>
+{{> footer }}

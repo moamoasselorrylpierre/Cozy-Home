@@ -1,0 +1,11 @@
+{
+  "name": "Cozy Home by Fany",
+  "short_name": "Cozy Home",
+  "description": "Rideaux sur mesure & relooking d’intérieur",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F6F1E9",
+  "theme_color": "#2F3E36",
+  "lang": "fr",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

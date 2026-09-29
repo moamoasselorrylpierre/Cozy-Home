@@ -1,0 +1,71 @@
+{{> head }}
+{{> header }}
+<section class="section" style="padding-top:clamp(40px,6vw,90px)">
+  <div class="container split">
+    <div>
+      <nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a><span aria-hidden="true">/</span>L’Atelier</nav>
+      <p class="kicker" data-reveal>{{ atelier.kicker }}</p>
+      <h1 data-reveal>{{ atelier.title }}</h1>
+      <p class="lead" data-reveal>{{ atelier.intro }}</p>
+    </div>
+    <figure class="portrait" data-reveal style="margin:0">
+      <div class="portrait__frame">
+        {{#if atelier.portrait}}<img src="{{ atelier.portrait }}" alt="{{ atelier.portraitCaption }}" width="800" height="1000">{{else}}<div class="portrait__monogram">Fany<small>Cozy Home</small></div>{{/if}}
+      </div>
+      <figcaption>{{ atelier.portraitCaption }}</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="section section--wash">
+  <div class="container--narrow">
+    <p class="kicker" data-reveal>Son histoire</p>
+    <h2 data-reveal>{{ atelier.storyTitle }}</h2>
+    <div class="prose" data-reveal>{{ nl2p atelier.story }}</div>
+  </div>
+</section>
+
+<section class="section section--tight">
+  <div class="container">
+    <blockquote class="quote-block" data-reveal>« {{ atelier.quote }} »</blockquote>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section__head" data-reveal><p class="kicker">Philosophie</p><h2>{{ atelier.valuesTitle }}</h2></div>
+    <div class="values">
+      {{#each atelier.values as v}}<article data-reveal style="--delay:{{ @index }}00ms"><h3>{{ v.title }}</h3><p>{{ v.text }}</p></article>{{/each}}
+    </div>
+  </div>
+</section>
+
+<section class="section section--wash">
+  <div class="container">
+    <div class="section__head" data-reveal><p class="kicker">Inspirations</p><h2>{{ atelier.galleryTitle }}</h2></div>
+    <div class="mosaic">
+      {{#each atelier.gallery as g}}<figure data-reveal style="--delay:{{ @index }}00ms"><div class="frame"><img src="{{ g.image }}" alt="{{ g.caption }}" loading="lazy" decoding="async" width="750" height="1000"></div><figcaption>{{ g.caption }}</figcaption></figure>{{/each}}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container split">
+    <div data-reveal>
+      <p class="kicker">Au-delà du rideau</p>
+      <h2>{{ atelier.relookingTitle }}</h2>
+      <p class="lead">{{ atelier.relookingText }}</p>
+      <div class="btn-row"><a class="btn" href="/composer">Composer mon intérieur</a><a class="btn btn--ghost" href="/contact?demande=conseil">Demander conseil</a></div>
+    </div>
+    <div class="frame" data-reveal><img src="/img/site/service-relooking.webp" alt="Pièce entièrement relookée : rideaux, coussins et plaid assortis" loading="lazy" width="1200" height="960"></div>
+  </div>
+</section>
+
+<section class="section section--dark cta-band">
+  <div class="container" data-reveal>
+    <h2>{{ atelier.ctaTitle }}</h2>
+    <p class="lead" style="margin-inline:auto;color:rgba(246,241,233,.78)">{{ atelier.ctaText }}</p>
+    <div class="btn-row"><a class="btn btn--light" href="{{ wa.link }}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"></use></svg>WhatsApp</a><a class="btn btn--outline-light" href="{{ site.social.tiktok }}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-tiktok"></use></svg>TikTok</a></div>
+  </div>
+</section>
+{{> footer }}

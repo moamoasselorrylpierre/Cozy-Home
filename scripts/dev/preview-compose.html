@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Banc d'essai — scènes composées</title>
+<style>body{margin:0;background:#ccc;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px}canvas{width:100%;display:block;background:#fff}p{margin:0;font:12px sans-serif}</style></head>
+<body>
+<script type="module">
+import { SceneRenderer, DECORS } from '/public/js/modules/curtain-scene.js';
+function fabric(kind) {
+  const c = document.createElement('canvas'); c.width = c.height = 512; const x = c.getContext('2d');
+  if (kind === 'velvet') { x.fillStyle = '#2F4A3E'; x.fillRect(0,0,512,512); }
+  else if (kind === 'sheer') { x.fillStyle = '#F4EEE3'; x.fillRect(0,0,512,512); }
+  else { x.fillStyle = '#F2E9DA'; x.fillRect(0,0,512,512); x.fillStyle='#B5654A'; for(let i=0;i<6;i++)for(let j=0;j<6;j++){x.beginPath();x.arc(i*85+42,j*85+42,22,0,7);x.fill();} }
+  return c;
+}
+const tex = { velvet: fabric('velvet'), sheer: fabric('sheer'), dots: fabric('dots') };
+const cases = DECORS.map((d, i) => [d.id, ['velvet','dots','sheer'][i % 3], i % 2 === 0, i === 3 ? 'tamise' : i === 4 ? 'avant' : 'jour']);
+for (const [decor, k, tieback, light] of cases) {
+  const wrap = document.createElement('div');
+  const cv = document.createElement('canvas'); cv.width = 800; cv.height = 500;
+  const p = document.createElement('p');
+  wrap.append(cv, p); document.body.append(wrap);
+  const r = new SceneRenderer(cv);
+  const t0 = performance.now();
+  r.render({ decor, curtain: { texture: tex[k], tileCm: 30, finish: k === 'velvet' ? 'velvet' : k === 'sheer' ? 'sheer' : 'matte', opacity: k === 'sheer' ? 0.32 : 1, heading: 'eyelet', hem: 'plain' },
+    pose: { panels: 2, openness: 0.3, tieback, mount: 'fenetre', length: 'sol', rail: 'apparent' }, textiles: { cushions: tex.dots, throw: tex.velvet, tablecloth: tex.sheer, bedspread: tex.dots }, light });
+  const t1 = performance.now();
+  r.render({ decor, curtain: { texture: tex[k], tileCm: 30, finish: 'matte', opacity: 1, heading: 'eyelet' }, pose: { panels: 2, openness: 0.3, tieback, mount: 'fenetre', length: 'sol' }, textiles: { cushions: tex.dots, throw: tex.velvet, tablecloth: tex.sheer, bedspread: tex.dots }, light, time: 1, sway: 1 });
+  const t2 = performance.now();
+  p.textContent = `${decor} · ${light} · 1er rendu ${Math.round(t1 - t0)} ms · rendu animé ${Math.round(t2 - t1)} ms`;
+}
+</script></body></html>

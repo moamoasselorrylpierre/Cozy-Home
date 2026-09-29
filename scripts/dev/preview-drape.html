@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Banc d'essai — drapé</title>
+<style>body{margin:0;background:#ddd;display:flex;flex-wrap:wrap;gap:10px;padding:10px;font-family:sans-serif}canvas{width:360px;height:450px;background:#fff}</style></head>
+<body>
+<script type="module">
+import { renderPresentoir } from '/public/js/modules/curtain-render.js';
+function fabric(kind) {
+  const c = document.createElement('canvas'); c.width = c.height = 512; const x = c.getContext('2d');
+  if (kind === 'stripe') { for (let i=0;i<8;i++){ x.fillStyle = i%2?'#E9DFCC':'#C9B28A'; x.fillRect(i*64,0,64,512);} x.fillStyle='#2F4A3E'; for(let i=0;i<8;i++) x.fillRect(i*64+30,0,4,512); }
+  else if (kind === 'velvet') { x.fillStyle = '#2F4A3E'; x.fillRect(0,0,512,512); }
+  else if (kind === 'sheer') { x.fillStyle = '#F4EEE3'; x.fillRect(0,0,512,512); }
+  else { x.fillStyle = '#F2E9DA'; x.fillRect(0,0,512,512); x.fillStyle='#B5654A'; for(let i=0;i<6;i++)for(let j=0;j<6;j++){x.beginPath();x.arc(i*85+42,j*85+42,22,0,7);x.fill();} }
+  for (let i=0;i<20000;i++){ x.fillStyle=`rgba(0,0,0,${Math.random()*0.05})`; x.fillRect(Math.random()*512,Math.random()*512,1,2); }
+  return c;
+}
+const cases = [
+  ['stripe', 'eyelet', 'matte', 1, 'ferme'], ['stripe', 'eyelet', 'matte', 1, 'miOuvert'], ['dots', 'pinch', 'matte', 1, 'embrasse'],
+  ['velvet', 'pinch', 'velvet', 1, 'embrasse'], ['sheer', 'rod', 'sheer', 0.32, 'ferme'], ['dots', 'tab', 'matte', 0.85, 'miOuvert'],
+  ['dots', 'rings', 'matte', 1, 'ferme'], ['stripe', 'tab', 'matte', 0.8, 'ferme', 'fringe'],
+];
+for (const [k, heading, finish, opacity, state, hem] of cases) {
+  const cv = document.createElement('canvas'); cv.width = 720; cv.height = 900; document.body.append(cv);
+  const t0 = performance.now();
+  renderPresentoir(cv, { texture: fabric(k), tileCm: 30, heading, finish, opacity, hem: hem || 'plain' }, state);
+  console.log(heading, state, Math.round(performance.now() - t0) + 'ms');
+}
+</script>
+</body></html>

@@ -1,0 +1,152 @@
+{{> head }}
+{{> header }}
+<section class="hero">
+  <div class="container hero__grid">
+    <div class="hero__text">
+      <p class="kicker" data-reveal>{{ home.heroKicker }}</p>
+      <h1 data-reveal style="--delay:.1s">{{ home.heroTitle }}</h1>
+      <p class="lead" data-reveal style="--delay:.2s">{{ home.heroText }}</p>
+      <div class="btn-row" data-reveal style="--delay:.3s">
+        <a class="btn" href="/galerie">{{ home.heroCtaPrimary }}</a>
+        <a class="btn btn--ghost" href="/contact?demande=devis">{{ home.heroCtaSecondary }}</a>
+      </div>
+      <a class="hero__scroll" href="#motifs">Découvrir</a>
+    </div>
+    <div class="hero__visual" data-reveal style="--delay:.15s">
+      <div class="hero__arch"><img src="{{ home.heroImage }}" alt="Salon habillé de rideaux Cozy Home, lumière du jour tamisée" width="1000" height="1300" fetchpriority="high" data-parallax></div>
+      {{#if featured}}<div class="hero__swatch" data-hero-swatch aria-hidden="true"></div>{{/if}}
+      <p class="hero__caption">Atelier · Sur mesure · Fait main</p>
+    </div>
+  </div>
+</section>
+
+<section class="section section--tight" id="motifs">
+  <div class="container">
+    <div class="section__head" data-reveal>
+      <p class="kicker">{{ home.featuredKicker }}</p>
+      <h2>{{ home.featuredTitle }}</h2>
+      <p class="lead">{{ home.featuredText }}</p>
+    </div>
+    <div class="featured-rail">
+      {{#each featured as m}}
+      <a class="model-card" href="/catalogue/{{ m.slug }}" data-palette="{{ m.palette }}" data-reveal style="--delay:{{ @index }}00ms">
+        <div class="model-card__media">
+          <span class="model-card__badge">{{ m.styleName }}</span>
+          <img src="{{ m.images.mockups.ferme }}"{{#if m.fermeSrcset}} srcset="{{ m.fermeSrcset }}" sizes="{{ m.sizes }}"{{/if}} alt="Rideau {{ m.name }} fermé, présenté sur tringle" loading="lazy" decoding="async" width="900" height="1125">
+          {{#if m.altSrc}}<img class="is-alt" data-src="{{ m.altSrc }}" alt="" decoding="async" width="900" height="1125">{{/if}}
+          <span class="model-card__swatch" style="background-image:url('{{ m.images.swatch }}')" aria-hidden="true"></span>
+        </div>
+        <div class="model-card__body">
+          <span class="model-card__style">{{ m.materialLabel }}</span>
+          <h3 class="model-card__name">{{ m.name }}</h3>
+          <div class="model-card__meta"><span>{{ m.priceLabel }}</span><span class="swatches">{{#each m.colors as c}}<i style="background:{{ c.hex }}"></i>{{/each}}</span></div>
+          <span class="model-card__line"></span>
+        </div>
+      </a>
+      {{/each}}
+    </div>
+    <p style="margin-top:48px" data-reveal><a class="link-arrow" href="/catalogue">Tout le catalogue <svg aria-hidden="true"><use href="#i-arrow"></use></svg></a></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section__head section__head--center" data-reveal>
+      <p class="kicker">{{ home.servicesKicker }}</p>
+      <h2>{{ home.servicesTitle }}</h2>
+    </div>
+    {{#each home.services as s}}
+    <article class="service">
+      <div class="service__media" data-reveal><div class="frame"><img src="{{ s.image }}" alt="{{ s.title }}" loading="lazy" decoding="async" width="1200" height="960"></div></div>
+      <div class="service__text" data-reveal style="--delay:.15s">
+        <span class="service__index">0{{ @number }}</span>
+        <h3 style="font-size:clamp(2rem,3.4vw,2.8rem)">{{ s.title }}</h3>
+        <p class="lead">{{ s.text }}</p>
+        <a class="link-arrow" href="{{ s.link }}">{{ s.cta }} <svg aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+      </div>
+    </article>
+    {{/each}}
+  </div>
+</section>
+
+<section class="section section--wash section--tight" aria-label="Nos engagements">
+  <div class="container assurance">
+    {{#each home.reassurance as r}}
+    <div class="assurance__item" data-reveal style="--delay:{{ @index }}00ms">
+      <svg aria-hidden="true"><use href="#i-{{ r.icon }}"></use></svg>
+      <h3>{{ r.title }}</h3>
+      <p>{{ r.text }}</p>
+    </div>
+    {{/each}}
+  </div>
+</section>
+
+<section class="section">
+  <div class="container split">
+    <div data-reveal>
+      <p class="kicker">La Galerie</p>
+      <h2>Huit salles,<br><em>huit ambiances</em></h2>
+      <p class="lead">Une exposition à parcourir comme un musée : chaque salle présente un style de rideau, sa matière, la lumière qu’il crée.</p>
+      <a class="btn" href="/galerie">Entrer dans la galerie</a>
+    </div>
+    <ol class="rooms-list" data-reveal style="--delay:.15s">
+      {{#each styles as s}}
+      <li><a href="/galerie#salle-{{ s.id }}"><span class="rooms-list__num">{{ s.roman }}.</span><span class="rooms-list__name">{{ s.name }}</span><span class="rooms-list__amb">{{ s.ambiance }}</span></a></li>
+      {{/each}}
+    </ol>
+  </div>
+</section>
+
+<section class="section section--dark">
+  <div class="container split">
+    <div class="frame" style="background:#26332C;border-color:#3A4A41" data-reveal>
+      <canvas class="composer-teaser" width="1600" height="1000" aria-label="Aperçu de l’outil de composition" role="img" data-composer-teaser></canvas>
+    </div>
+    <div data-reveal style="--delay:.15s">
+      <p class="kicker kicker--light">{{ home.composerKicker }}</p>
+      <h2>{{ home.composerTitle }}</h2>
+      <p class="lead" style="color:rgba(246,241,233,.78)">{{ home.composerText }}</p>
+      <a class="btn btn--light" href="/composer">Ouvrir l’atelier de composition</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section__head section__head--center" data-reveal>
+      <p class="kicker">{{ home.tiktokKicker }}</p>
+      <h2>{{ home.tiktokTitle }}</h2>
+      <p class="lead" style="margin-inline:auto">{{ home.tiktokText }}</p>
+    </div>
+    <div class="tiktok-grid" data-reveal>
+      {{#if tiktokVideos}}
+        {{#each tiktokVideos as v}}
+        <button class="tiktok-card" type="button" data-tiktok-id="{{ v.id }}" aria-label="Lire la vidéo TikTok : {{ v.caption }}">
+          <span class="tiktok-card__play"><svg aria-hidden="true"><use href="#i-play"></use></svg></span>
+          <span class="tiktok-card__overlay"><span class="tiktok-card__handle"><svg aria-hidden="true"><use href="#i-tiktok"></use></svg>@cozyhomebyfany</span><span class="tiktok-card__caption">{{ v.caption }}</span></span>
+        </button>
+        {{/each}}
+      {{else}}
+        <a class="tiktok-card" href="{{ site.social.tiktok }}" target="_blank" rel="noopener" data-tiktok-fallback="0"><span class="tiktok-card__play"><svg aria-hidden="true"><use href="#i-play"></use></svg></span><span class="tiktok-card__overlay"><span class="tiktok-card__handle"><svg aria-hidden="true"><use href="#i-tiktok"></use></svg>@cozyhomebyfany</span><span class="tiktok-card__caption">Les poses de la semaine</span></span></a>
+        <a class="tiktok-card" href="{{ site.social.tiktok }}" target="_blank" rel="noopener" data-tiktok-fallback="1"><span class="tiktok-card__play"><svg aria-hidden="true"><use href="#i-play"></use></svg></span><span class="tiktok-card__overlay"><span class="tiktok-card__handle"><svg aria-hidden="true"><use href="#i-tiktok"></use></svg>@cozyhomebyfany</span><span class="tiktok-card__caption">Avant / après : un salon relooké</span></span></a>
+        <a class="tiktok-card" href="{{ site.social.tiktok }}" target="_blank" rel="noopener" data-tiktok-fallback="2"><span class="tiktok-card__play"><svg aria-hidden="true"><use href="#i-play"></use></svg></span><span class="tiktok-card__overlay"><span class="tiktok-card__handle"><svg aria-hidden="true"><use href="#i-tiktok"></use></svg>@cozyhomebyfany</span><span class="tiktok-card__caption">Dans l’atelier de Fany</span></span></a>
+      {{/if}}
+    </div>
+    <p style="text-align:center;margin-top:40px"><a class="btn btn--ghost" href="{{ site.social.tiktok }}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-tiktok"></use></svg>Suivre @cozyhomebyfany</a></p>
+  </div>
+</section>
+
+<section class="section section--wash cta-band">
+  <div class="container" data-reveal>
+    <p class="kicker" style="justify-content:center">Votre projet</p>
+    <h2>Une fenêtre à habiller, une pièce à <em>réinventer</em> ?</h2>
+    <p class="lead" style="margin-inline:auto">Parlez-en à Fany : conseil, devis, prise de mesures — elle vous répond personnellement.</p>
+    <div class="btn-row">
+      <a class="btn" href="/contact?demande=devis">Demander un devis</a>
+      <a class="btn btn--ghost" href="/contact?demande=conseil">Demander un conseil</a>
+      <a class="btn btn--wa" href="{{ wa.link }}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-whatsapp"></use></svg>WhatsApp</a>
+    </div>
+  </div>
+</section>
+<script type="application/json" id="page-data">{{{ pageData }}}</script>
+{{> footer }}
