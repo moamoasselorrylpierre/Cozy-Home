@@ -134,7 +134,10 @@ export function registerPages(router) {
       featured: (featured.length ? featured : models.slice(0, 6)).map((m) => card(m)),
       styles: read('styles').sort((a, b) => a.order - b.order),
       tiktokVideos: (home.tiktokVideos || []).filter((v) => /tiktok\.com\/.*\/video\/(\d+)/.test(v.url)).map((v) => ({ ...v, id: /video\/(\d+)/.exec(v.url)[1] })),
-      pageData: safeJson({ featured: featured.map(publicModel) }),
+      pageData: safeJson({
+        featured: featured.map(publicModel),
+        fallbackVisuals: (ctx.content.atelier?.gallery || []).map((g) => g.image).filter(Boolean).slice(0, 3),
+      }),
     });
   });
 

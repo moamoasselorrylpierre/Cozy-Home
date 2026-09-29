@@ -357,7 +357,7 @@ export async function render(el, { params }) {
         const encoded = encodeMockups(hd);
         const jobs = [];
         if (st.image) jobs.push(['original', compress(st.image, { maxSide: 1600, quality: 0.85 })]);
-        jobs.push(['swatch', compress(st.tile, { maxSide: 512, quality: 0.9 })]);
+        jobs.push(['swatch', compress(st.tile, { maxSide: 512, quality: 0.84 })]);
         for (const [k, v] of Object.entries(encoded)) jobs.push([`mockup:${k}`, v]);
         let n = 0;
         for (const [key, dataUrl] of jobs) {

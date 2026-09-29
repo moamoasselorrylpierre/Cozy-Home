@@ -173,7 +173,7 @@ export function colorFamily(hex) {
 
 const NAMED = [
   ['Ivoire', '#F4EEE3'], ['Blanc cassé', '#EDEAE2'], ['Écru', '#EAE0CC'], ['Lin', '#E4D6BE'], ['Sable', '#D6C3A1'],
-  ['Grège', '#C8BBA6'], ['Taupe', '#8E7F6F'], ['Gris perle', '#C9C7C2'], ['Gris ardoise', '#5E6268'], ['Anthracite', '#2F2E2C'],
+  ['Grège', '#C8BBA6'], ['Taupe', '#8E7F6F'], ['Taupe foncé', '#6E6254'], ['Doré antique', '#B59559'], ['Or pâle', '#CDB27A'], ['Gris perle', '#C9C7C2'], ['Gris ardoise', '#5E6268'], ['Anthracite', '#2F2E2C'],
   ['Noir', '#151515'], ['Chocolat', '#4A3226'], ['Brun', '#6B4A35'], ['Caramel', '#B07A45'], ['Terracotta', '#B5654A'],
   ['Rouille', '#A24E2C'], ['Brique', '#9A4A3A'], ['Ocre', '#C99034'], ['Or', '#C9A227'], ['Champagne', '#D8C398'],
   ['Moutarde', '#C8A23A'], ['Vert sauge', '#9CAF94'], ['Vert olive', '#6B6B3A'], ['Vert sapin', '#2F4A3E'], ['Vert émeraude', '#1F6B52'],

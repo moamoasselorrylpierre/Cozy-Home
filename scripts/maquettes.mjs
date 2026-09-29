@@ -37,10 +37,45 @@ async function scrollThrough(page) {
   });
 }
 
+// Figer les éléments collants/fixes pour une capture continue et afficher tous les blocs animés.
+const FREEZE = `.site-header,.filters,.frise,.composer__stage,.product__gallery,.contact-aside,.order-summary{position:relative!important;top:auto!important}
+.composer__actions{position:static!important}.wa-float{display:none!important}[data-reveal]{opacity:1!important;transform:none!important}`;
+
+/** Capture pleine page par tranches (le rendu logiciel limite une capture à ~8 000 px), puis assemblage. */
+async function fullPageJpeg(page, file, quality) {
+  await page.addStyleTag({ content: FREEZE });
+  await page.waitForTimeout(300);
+  const { width, height } = await page.evaluate(() => ({ width: document.documentElement.clientWidth, height: document.documentElement.scrollHeight }));
+  const chunks = [];
+  for (let y = 0; y < height; y += 4000) {
+    const h = Math.min(4000, height - y);
+    const buf = await page.screenshot({ clip: { x: 0, y, width, height: h }, fullPage: true, type: 'png' });
+    chunks.push({ y, h, data: buf.toString('base64') });
+  }
+  const stitcher = await page.context().newPage();
+  const jpeg = await stitcher.evaluate(async ({ chunks, width, height, quality }) => {
+    const c = document.createElement('canvas');
+    c.width = width;
+    c.height = height;
+    const ctx = c.getContext('2d');
+    for (const ch of chunks) {
+      const img = new Image();
+      img.src = `data:image/png;base64,${ch.data}`;
+      await img.decode();
+      ctx.drawImage(img, 0, ch.y);
+    }
+    return c.toDataURL('image/jpeg', quality).split(',')[1];
+  }, { chunks, width, height, quality: quality / 100 });
+  await stitcher.close();
+  await fs.writeFile(file, Buffer.from(jpeg, 'base64'));
+}
+
 async function shoot(page, name, { full = true, wait = 1200 } = {}) {
   if (full) await scrollThrough(page);
   await page.waitForTimeout(wait);
-  await page.screenshot({ path: path.join(OUT, `${name}.jpg`), fullPage: full, type: 'jpeg', quality: 72 });
+  const file = path.join(OUT, `${name}.jpg`);
+  if (full) await fullPageJpeg(page, file, 72);
+  else await page.screenshot({ path: file, type: 'jpeg', quality: 76 });
   console.log('•', name);
 }
 
@@ -85,6 +120,7 @@ for (const [device, viewport] of [['desktop', { width: 1440, height: 900 }], ['m
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 const page = await ctx.newPage();
 page.on('pageerror', (e) => console.error('[admin]', e.message));
+page.on('dialog', (d) => d.accept()); // « modifications non enregistrées » : on quitte l'écran
 // Une demande de démonstration pour peupler le tableau de bord.
 await fetch(`${base}/api/requests`, {
   method: 'POST',

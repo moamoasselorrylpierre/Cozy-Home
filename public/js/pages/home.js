@@ -35,12 +35,13 @@ if (heroImg && !prefersReducedMotion()) {
   }, { passive: true });
 }
 
-// Cartes TikTok de repli : visuels de l'atelier.
+// Cartes TikTok de repli (tant qu'aucune vidéo n'est choisie dans l'espace pro) : visuels de l'atelier.
+const fallbackVisuals = data.fallbackVisuals || [];
 $$('[data-tiktok-fallback]').forEach((card) => {
-  const m = featured[Number(card.dataset.tiktokFallback) % Math.max(1, featured.length)];
-  if (!m) return;
+  const src = fallbackVisuals[Number(card.dataset.tiktokFallback) % Math.max(1, fallbackVisuals.length)];
+  if (!src) return;
   const img = document.createElement('img');
-  img.src = m.images.mockups.embrasse || m.images.mockups.ferme;
+  img.src = src;
   img.alt = '';
   img.loading = 'lazy';
   card.prepend(img);

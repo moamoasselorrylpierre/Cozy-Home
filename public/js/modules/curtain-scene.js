@@ -105,8 +105,9 @@ export class SceneRenderer {
   #replay(ctx) {
     if (!this.entry) return;
     ctx.save();
-    for (let i = 0; i < this.entry.depth; i++) ctx.save();
+    // La transformation est fixée AVANT d'empiler les états, pour que les restore() du décor y reviennent.
     ctx.setTransform(this.entry.transform);
+    for (let i = 0; i < this.entry.depth; i++) ctx.save();
     for (const [kind, prop, value] of this.log) {
       if (kind === 1) ctx[prop] = value;
       else ctx[prop](...value);

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banc d'essai — décors</title>
+<style>
+  :root { --ivoire: #F6F1E9; --lin: #EFE6D8; --sapin: #2F3E36; --anthracite: #26241F; --dore: #C9A227; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 28px 40px; background: var(--ivoire); color: var(--anthracite);
+         font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; margin-bottom: 16px; }
+  h1 { font: 500 22px/1.2 Georgia, serif; margin: 0; color: var(--sapin); }
+  header label { font-size: 13px; display: inline-flex; gap: 6px; align-items: center; }
+  #stats { font-size: 12px; color: #6b655b; }
+  .grid { display: grid; grid-template-columns: repeat(2, 800px); gap: 22px 36px; }
+  .grid.single { grid-template-columns: 1fr; }
+  figure { margin: 0; }
+  canvas { display: block; width: 800px; height: 500px; background: #ddd; border-radius: 4px;
+           box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 8px 24px rgba(38,36,31,.08); }
+  .single canvas { width: 1600px; height: 1000px; }
+  figcaption { display: flex; justify-content: space-between; padding: 6px 2px 0; font-size: 13px; }
+  figcaption b { font-weight: 600; color: var(--sapin); }
+  figcaption span { color: #7a7368; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Décors — banc d'essai</h1>
+  <label><input type="checkbox" id="optCurtains" checked> rideaux factices</label>
+  <label><input type="checkbox" id="optTextiles" checked> textiles de test</label>
+  <label><input type="checkbox" id="optGuides"> repères du spec</label>
+  <span id="stats"></span>
+</header>
+<div class="grid" id="grid"></div>
+
+<script type="module">
+import { DECORS, drawDecor } from '../../public/js/modules/scenes.js';
+import { paintTextile } from '../../public/js/modules/textile.js';
+
+// Paramètres d'URL : ?curtains=0 &textiles=0 &guides=1 &only=<id> &size=1600
+const params = new URLSearchParams(location.search);
+const opt = {
+  curtains: params.get('curtains') !== '0',
+  textiles: params.get('textiles') !== '0',
+  guides: params.get('guides') === '1',
+  only: params.get('only'),
+  full: params.get('size') === '1600',
+};
+document.getElementById('optCurtains').checked = opt.curtains;
+document.getElementById('optTextiles').checked = opt.textiles;
+document.getElementById('optGuides').checked = opt.guides;
+
+// Texture de test : damier doux (une couleur par emplacement pour repérer les slots)
+const SLOT_TINTS = { cushions: ['#E7D3C0', '#C98F6E'], throw: ['#D9DCCB', '#8E9C7C'], bedspread: ['#E9E1D2', '#B9A58A'],
+  tablecloth: ['#F3EFE6', '#C9BDA6'], towel: ['#E6EEF0', '#9DB3B8'] };
+const checkerCache = {};
+function checker(slot) {
+  if (checkerCache[slot]) return checkerCache[slot];
+  const [a, b] = SLOT_TINTS[slot] || ['#EEE6D8', '#B7A992'];
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d');
+  g.fillStyle = a; g.fillRect(0, 0, 128, 128);
+  g.fillStyle = b; g.globalAlpha = 0.55;
+  g.fillRect(0, 0, 64, 64); g.fillRect(64, 64, 64, 64);
+  g.globalAlpha = 0.25; g.fillRect(28, 28, 8, 8); g.fillRect(92, 92, 8, 8);
+  return (checkerCache[slot] = c);
+}
+
+// drawCurtains factice : barre + deux panneaux semi-transparents + voilage léger
+function fakeCurtains(ctx, spec) {
+  const { window: win, rodMaxX0, rodMaxX1, floorY, ceilingY, mode } = spec;
+  const rodY = mode === 'shower' ? win.y : Math.max(ceilingY + 18, win.y - 36);
+  ctx.save();
+  ctx.fillStyle = 'rgba(250,248,242,0.28)';
+  ctx.fillRect(rodMaxX0, rodY, rodMaxX1 - rodMaxX0, floorY - rodY);
+  ctx.fillStyle = 'rgba(176,120,92,0.72)';
+  const panel = Math.min(170, (rodMaxX1 - rodMaxX0) * 0.22);
+  ctx.fillRect(rodMaxX0 + 6, rodY, panel, floorY - rodY);
+  ctx.fillRect(rodMaxX1 - 6 - panel, rodY, panel, floorY - rodY);
+  ctx.fillStyle = '#3a3129';
+  ctx.fillRect(rodMaxX0 - 14, rodY - 5, rodMaxX1 - rodMaxX0 + 28, 8);
+  ctx.beginPath(); ctx.arc(rodMaxX0 - 16, rodY - 1, 8, 0, Math.PI * 2); ctx.arc(rodMaxX1 + 16, rodY - 1, 8, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+function testPaintTextile(ctx, slot, path, opts) {
+  paintTextile(ctx, path, { ...opts, texture: checker(slot) });
+}
+
+function guides(ctx, spec) {
+  ctx.save();
+  ctx.lineWidth = 2; ctx.setLineDash([10, 8]);
+  const line = (y, c, label) => {
+    ctx.strokeStyle = c; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1600, y); ctx.stroke();
+    ctx.fillStyle = c; ctx.font = '600 22px system-ui'; ctx.fillText(label + ' ' + Math.round(y), 10, y - 6);
+  };
+  line(spec.ceilingY, '#1b6fd8', 'ceilingY');
+  line(spec.sillY, '#d8791b', 'sillY');
+  line(spec.floorY, '#1ba35a', 'floorY');
+  ctx.strokeStyle = '#d81b60';
+  ctx.strokeRect(spec.window.x, spec.window.y, spec.window.w, spec.window.h);
+  ctx.beginPath(); ctx.moveTo(spec.rodMaxX0, 0); ctx.lineTo(spec.rodMaxX0, 1000);
+  ctx.moveTo(spec.rodMaxX1, 0); ctx.lineTo(spec.rodMaxX1, 1000); ctx.stroke();
+  ctx.restore();
+}
+
+const grid = document.getElementById('grid');
+const list = opt.only ? DECORS.filter((d) => d.id === opt.only) : DECORS;
+if (opt.full) grid.classList.add('single');
+const cells = list.map((d) => {
+  const fig = document.createElement('figure');
+  const cv = document.createElement('canvas');
+  const k = opt.full ? 1 : 0.5;
+  cv.width = 1600 * k; cv.height = 1000 * k;
+  const cap = document.createElement('figcaption');
+  cap.innerHTML = `<b>${d.label}</b> — ${d.style} · <code>${d.id}</code><span></span>`;
+  fig.append(cv, cap);
+  grid.append(fig);
+  return { d, cv, k, span: cap.querySelector('span') };
+});
+
+const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+
+function render(cell, api) {
+  const ctx = cell.cv.getContext('2d');
+  ctx.setTransform(cell.k, 0, 0, cell.k, 0, 0);
+  const t0 = performance.now();
+  let spec = null;
+  const wrapped = { ...api };
+  if (api.drawCurtains || opt.guides) {
+    wrapped.drawCurtains = (c, s) => { spec = s; if (api.drawCurtains) api.drawCurtains(c, s); };
+  }
+  drawDecor(ctx, cell.d.id, wrapped);
+  probe.drawImage(cell.cv, 0, 0, 1, 1); // force le rendu pour une mesure honnête
+  probe.getImageData(0, 0, 1, 1);
+  const dt = performance.now() - t0;
+  if (opt.guides && spec) guides(ctx, spec);
+  return dt;
+}
+
+function renderAll() {
+  const api = {};
+  if (opt.curtains) api.drawCurtains = fakeCurtains;
+  if (opt.textiles) api.paintTextile = testPaintTextile;
+  const cold = cells.map((c) => render(c, api));
+  const warm = cells.map((c) => render(c, api));
+  cells.forEach((c, i) => { c.span.textContent = `froid ${cold[i].toFixed(1)} ms · chaud ${warm[i].toFixed(1)} ms`; });
+  const max = Math.max(...warm);
+  document.getElementById('stats').textContent = `Temps de dessin (chaud) max : ${max.toFixed(1)} ms`;
+  console.log('[preview] warm ms', Object.fromEntries(cells.map((c, i) => [c.d.id, +warm[i].toFixed(1)])));
+}
+
+for (const id of ['optCurtains', 'optTextiles', 'optGuides']) {
+  document.getElementById(id).addEventListener('change', (e) => {
+    const key = { optCurtains: 'curtains', optTextiles: 'textiles', optGuides: 'guides' }[id];
+    opt[key] = e.target.checked;
+    renderAll();
+  });
+}
+renderAll();
+</script>
+</body>
+</html>

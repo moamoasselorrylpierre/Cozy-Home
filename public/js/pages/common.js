@@ -48,5 +48,12 @@ export function observeReveals(root = document) {
 }
 observeReveals();
 
+// Vue secondaire des cartes (rideau avec embrasses) : chargée seulement au premier survol.
+document.addEventListener('pointerover', (e) => {
+  if (e.pointerType === 'touch') return;
+  const img = e.target.closest?.('.model-card')?.querySelector('img.is-alt[data-src]');
+  if (img) { img.src = img.dataset.src; img.removeAttribute('data-src'); }
+}, { passive: true });
+
 // Thème dynamique : les éléments [data-palette] teintent l'interface au survol.
 bindHover(document);

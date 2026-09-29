@@ -29,6 +29,6 @@ export async function generateMockups(tile, render, { width = MOCKUP_SIZE.width 
 }
 
 /** Encode les rendus pour le téléversement. */
-export function encodeMockups(mockups, quality = 0.84) {
+export function encodeMockups(mockups, quality = 0.8) {
   return Object.fromEntries(mockups.map((m) => [m.key, compress(m.canvas, { maxSide: 1200, quality })]));
 }

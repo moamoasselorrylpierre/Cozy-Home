@@ -39,7 +39,7 @@
       <div class="model-card__media">
         <span class="model-card__badge">{{ m.availabilityLabel }}</span>
         <img src="{{ m.cover }}" alt="Rideau {{ m.name }}, {{ m.styleName }}, monté et drapé sur tringle" loading="lazy" decoding="async" width="900" height="1125">
-        {{#if m.images.mockups.embrasse}}<img class="is-alt" src="{{ m.images.mockups.embrasse }}" alt="" loading="lazy" decoding="async" width="900" height="1125">{{/if}}
+        {{#if m.images.mockups.embrasse}}<img class="is-alt" data-src="{{ m.images.mockups.embrasse }}" alt="" decoding="async" width="900" height="1125">{{/if}}
         <span class="model-card__swatch" style="background-image:url('{{ m.images.swatch }}')" aria-hidden="true"></span>
       </div>
       <div class="model-card__body">

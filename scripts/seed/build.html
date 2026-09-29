@@ -81,7 +81,7 @@ window.fabricIds = FABRICS.map((f) => f.id);
 
 window.buildFabric = (id) => {
   const t = tile(id);
-  return { tile: webp(t, 0.9), sample: webp(sample(t), 0.86), analysis: analyzeFabric(t) };
+  return { tile: webp(t, 0.82), sample: webp(sample(t), 0.8), analysis: analyzeFabric(t) };
 };
 
 window.buildMockups = async (id, render) => {
@@ -92,7 +92,7 @@ window.buildMockups = async (id, render) => {
     c.width = 900;
     c.height = 1125;
     renderPresentoir(c, { texture: tile(id), ...render }, key);
-    out[key] = webp(c, 0.84);
+    out[key] = webp(c, 0.8);
   }
   return out;
 };
