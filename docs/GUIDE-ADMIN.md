@@ -46,7 +46,9 @@ Menu **Ajouter un modèle** :
 4. **Fiche du modèle** — nom, description (le bouton *✦ Proposer une description* rédige un premier jet),
    pièces conseillées, familles de couleur (utilisées par les filtres), disponibilité, prix (vide = « sur devis »),
    *à la une* (affiché sur l’accueil).
-5. **Publier sur le site** — le modèle apparaît aussitôt au catalogue, dans la galerie et dans *Compose ton intérieur*.
+5. **Publier sur le site** — les images sont compressées automatiquement (version grande + version mobile), puis
+   envoyées sur Cloudflare ; le message de confirmation indique le poids obtenu. Le modèle apparaît aussitôt au
+   catalogue, dans la galerie et dans *Compose ton intérieur*.
    *Enregistrer en brouillon* le garde invisible pour le terminer plus tard.
 
 ![Ajout d’un modèle](maquettes/admin-ajout-modele.jpg)
@@ -82,7 +84,8 @@ Menu **Contenus du site** : une rubrique par page (Informations générales, Acc
 Compose ton intérieur, Contact, L’Atelier, Confidentialité, Référencement).
 
 - Modifiez les textes puis **Enregistrer les contenus** (en bas).
-- **Images** : *Remplacer* → choisissez une photo ; elle est automatiquement allégée. Pensez ensuite à enregistrer.
+- **Images** : *Remplacer* → choisissez une photo ; elle est automatiquement compressée avant l’envoi (le poids
+  avant/après s’affiche). Pensez ensuite à enregistrer.
   Remplacez notamment le visuel d’ouverture, les images des services, le portrait de Fany et les photos de l’atelier.
 - **Réseaux sociaux** : le jour où Instagram ou Facebook existent, collez le lien — l’icône « bientôt » devient active.
 - **Vidéos TikTok** : collez le lien de partage d’une vidéo (`https://www.tiktok.com/@cozyhomebyfany/video/…`) pour
@@ -103,12 +106,13 @@ la matière, l’ambiance, la **pièce exposée** (un modèle publié de ce styl
   alors déconnectés.
 - **Équipe** (réservé à Fany) : *Ajouter un membre* crée un compte avec un mot de passe provisoire à transmettre ;
   *Retirer* supprime l’accès immédiatement. Les membres de l’équipe ne peuvent pas gérer les comptes.
-- Mot de passe oublié : la personne qui gère l’hébergement peut le réinitialiser avec
-  `npm run admin:create -- fany "NouveauMotDePasse2026"`.
+- Mot de passe oublié : sur Cloudflare, ajoutez au Worker le secret `ADMIN_PASSWORD_RESET` avec un nouveau mot de
+  passe, ouvrez `/admin`, connectez-vous, puis supprimez ce secret (détails dans docs/DEPLOIEMENT-CLOUDFLARE.md).
 
 ## 9. Bonnes pratiques
 
-- Sauvegardez régulièrement le dossier de données du site (voir README) : il contient modèles, textes, demandes et images.
+- Les données sont sur Cloudflare (base D1 et stockage R2) : aucune machine n’a besoin d’être allumée.
+  Pensez à exporter régulièrement la base (voir docs/DEPLOIEMENT-CLOUDFLARE.md, « Sauvegarde »).
 - Les 16 tissus fournis au lancement sont des **exemples de démonstration** : remplacez-les par vos créations
   (archivez-les ou supprimez-les au fur et à mesure) et vérifiez les prix.
 - Déconnectez-vous sur un ordinateur partagé (bas du menu).

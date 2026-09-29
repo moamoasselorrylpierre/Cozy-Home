@@ -2,16 +2,11 @@
 // Démarre le site sur des données neuves, se connecte à l'espace pro et simule l'ajout d'un tissu.
 // Usage : npm run maquettes
 import fs from 'node:fs/promises';
-import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'docs/maquettes');
-const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'cozy-maquettes-'));
-process.env.DATA_DIR = tmp;
-process.env.ADMIN_USER = 'fany';
-process.env.ADMIN_PASSWORD = 'Maquettes-2026';
 
 async function loadPlaywright() {
   for (const spec of ['playwright', '/opt/node22/lib/node_modules/playwright/index.mjs']) {
@@ -20,9 +15,10 @@ async function loadPlaywright() {
   throw new Error('Playwright est requis : npm i -D playwright');
 }
 
-const { startServer } = await import('../server/app.js');
-const server = await startServer({ port: 0, host: '127.0.0.1', quiet: true });
-const base = `http://127.0.0.1:${server.address().port}`;
+// Site lancé en local dans le moteur Cloudflare (wrangler dev), avec une base D1 et un stockage R2 neufs.
+const { startWorker } = await import('../tests/worker.js');
+const worker = await startWorker({ vars: { ADMIN_USER: 'fany', ADMIN_PASSWORD: 'Maquettes-2026' } });
+const base = worker.base;
 const { chromium } = await loadPlaywright();
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 await fs.mkdir(OUT, { recursive: true });
@@ -154,7 +150,6 @@ await page.waitForSelector('.content-section');
 await shoot(page, 'admin-contenus', { full: false });
 
 await browser.close();
-server.close();
-await fs.rm(tmp, { recursive: true, force: true });
+await worker.stop();
 console.log(`\nMaquettes enregistrées dans ${path.relative(ROOT, OUT)}/`);
 process.exit(0);

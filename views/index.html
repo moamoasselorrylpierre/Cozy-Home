@@ -32,8 +32,8 @@
       <a class="model-card" href="/catalogue/{{ m.slug }}" data-palette="{{ m.palette }}" data-reveal style="--delay:{{ @index }}00ms">
         <div class="model-card__media">
           <span class="model-card__badge">{{ m.styleName }}</span>
-          <img src="{{ m.images.mockups.ferme }}" alt="Rideau {{ m.name }} fermé, présenté sur tringle" loading="lazy" decoding="async" width="900" height="1125">
-          {{#if m.images.mockups.embrasse}}<img class="is-alt" data-src="{{ m.images.mockups.embrasse }}" alt="" decoding="async" width="900" height="1125">{{/if}}
+          <img src="{{ m.images.mockups.ferme }}"{{#if m.fermeSrcset}} srcset="{{ m.fermeSrcset }}" sizes="{{ m.sizes }}"{{/if}} alt="Rideau {{ m.name }} fermé, présenté sur tringle" loading="lazy" decoding="async" width="900" height="1125">
+          {{#if m.altSrc}}<img class="is-alt" data-src="{{ m.altSrc }}" alt="" decoding="async" width="900" height="1125">{{/if}}
           <span class="model-card__swatch" style="background-image:url('{{ m.images.swatch }}')" aria-hidden="true"></span>
         </div>
         <div class="model-card__body">

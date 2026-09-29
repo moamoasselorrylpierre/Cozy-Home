@@ -5,9 +5,7 @@
 //   {{> partiel }}               inclusion de views/partials/partiel.html
 //   {{#if chemin}}…{{else}}…{{/if}}, {{#unless chemin}}…{{/unless}}
 //   {{#each chemin as nom}}…{{/each}}   (variables @index, @first, @last)
-import fs from 'node:fs';
-import path from 'node:path';
-import { config, isDev } from './config.js';
+import { VIEWS } from './views.js';
 
 const astCache = new Map();
 
@@ -158,10 +156,10 @@ function renderNodes(nodes, scope) {
 }
 
 function loadTemplate(name) {
-  if (!isDev && astCache.has(name)) return astCache.get(name);
-  const file = path.join(config.viewsDir, `${name}.html`);
-  const src = fs.readFileSync(file, 'utf8');
-  const ast = parse(tokenize(src), file);
+  if (astCache.has(name)) return astCache.get(name);
+  const src = VIEWS[name];
+  if (src === undefined) throw new Error(`Gabarit introuvable : ${name}`);
+  const ast = parse(tokenize(src), name);
   astCache.set(name, ast);
   return ast;
 }

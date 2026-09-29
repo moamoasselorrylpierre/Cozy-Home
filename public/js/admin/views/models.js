@@ -36,7 +36,7 @@ export async function render(el) {
       && (!query || m.name.toLowerCase().includes(query)));
     list.innerHTML = items.length ? items.map((m) => html`
       <article class="model-admin" data-id="${m.id}">
-        <a class="model-admin__img" href="#/modeles/${m.id}">${m.images?.mockups?.miOuvert || m.images?.swatch ? raw(`<img src="${m.images.mockups.miOuvert || m.images.swatch}" alt="" loading="lazy">`) : raw('<span>Sans visuel</span>')}</a>
+        <a class="model-admin__img" href="#/modeles/${m.id}">${m.images?.mockups?.miOuvert || m.images?.swatch ? raw(`<img src="${m.images.mockupsSmall?.miOuvert || m.images.mockups.miOuvert || m.images.swatch}" alt="" loading="lazy">`) : raw('<span>Sans visuel</span>')}</a>
         <div class="model-admin__body">
           <div class="model-admin__row"><h3><a href="#/modeles/${m.id}">${m.name}</a></h3>${modelStatusBadge(m.status)}</div>
           <p class="muted">${STYLE_LABELS[m.style] || m.style} · ${labelOf(AVAILABILITY, m.availability)}${m.featured ? ' · ★ À la une' : ''}${m.demo ? raw(' <span class="badge badge--demo" title="Modèle d’exemple livré avec le site : à remplacer par vos créations">démo</span>') : ''}</p>

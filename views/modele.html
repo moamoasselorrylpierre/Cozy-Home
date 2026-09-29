@@ -5,7 +5,7 @@
   <div class="product">
     <div class="product__gallery" data-gallery>
       <div class="product__thumbs" role="group" aria-label="Vues du modèle">
-        {{#each mockups as v}}<button type="button" data-view="{{ v.src }}" data-label="{{ v.label }}" aria-pressed="{{#if @first}}true{{else}}false{{/if}}"><img src="{{ v.src }}" alt="{{ v.label }}" loading="lazy" width="180" height="225"></button>{{/each}}
+        {{#each mockups as v}}<button type="button" data-view="{{ v.src }}" data-label="{{ v.label }}" aria-pressed="{{#if @first}}true{{else}}false{{/if}}"><img src="{{ v.thumb }}" alt="{{ v.label }}" loading="lazy" decoding="async" width="180" height="225"></button>{{/each}}
       </div>
       <div class="product__stage">
         {{#each mockups as v}}{{#if @first}}<img src="{{ v.src }}" alt="Rideau {{ model.name }} — {{ v.label }}" data-stage width="900" height="1125" fetchpriority="high">{{/if}}{{/each}}
@@ -59,7 +59,7 @@
     <div class="model-grid">
       {{#each related as m}}
       <a class="model-card" href="/catalogue/{{ m.slug }}" data-palette="{{ m.palette }}" data-reveal>
-        <div class="model-card__media"><img src="{{ m.cover }}" alt="Rideau {{ m.name }}" loading="lazy" decoding="async" width="900" height="1125"></div>
+        <div class="model-card__media"><img src="{{ m.cover }}"{{#if m.coverSrcset}} srcset="{{ m.coverSrcset }}" sizes="{{ m.sizes }}"{{/if}} alt="Rideau {{ m.name }}" loading="lazy" decoding="async" width="900" height="1125"></div>
         <div class="model-card__body"><span class="model-card__style">{{ m.styleName }}</span><h3 class="model-card__name">{{ m.name }}</h3><span class="model-card__line"></span></div>
       </a>
       {{/each}}

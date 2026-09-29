@@ -58,9 +58,14 @@ for (const [i, meta] of MODELS_META.entries()) {
     original: await writeDataUrl(`public/img/fabrics/${meta.slug}-echantillon.webp`, fabric.sample),
     swatch: await writeDataUrl(`public/img/fabrics/${meta.slug}.webp`, fabric.tile),
     mockups: {
-      ferme: await writeDataUrl(`public/img/mockups/${meta.slug}-ferme.webp`, mockups.ferme),
-      miOuvert: await writeDataUrl(`public/img/mockups/${meta.slug}-mi-ouvert.webp`, mockups.miOuvert),
-      embrasse: await writeDataUrl(`public/img/mockups/${meta.slug}-embrasse.webp`, mockups.embrasse),
+      ferme: await writeDataUrl(`public/img/mockups/${meta.slug}-ferme.webp`, mockups.ferme.large),
+      miOuvert: await writeDataUrl(`public/img/mockups/${meta.slug}-mi-ouvert.webp`, mockups.miOuvert.large),
+      embrasse: await writeDataUrl(`public/img/mockups/${meta.slug}-embrasse.webp`, mockups.embrasse.large),
+    },
+    mockupsSmall: {
+      ferme: await writeDataUrl(`public/img/mockups/${meta.slug}-ferme-480.webp`, mockups.ferme.small),
+      miOuvert: await writeDataUrl(`public/img/mockups/${meta.slug}-mi-ouvert-480.webp`, mockups.miOuvert.small),
+      embrasse: await writeDataUrl(`public/img/mockups/${meta.slug}-embrasse-480.webp`, mockups.embrasse.small),
     },
   };
   const a = fabric.analysis;

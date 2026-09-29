@@ -38,8 +38,8 @@
        data-style="{{ m.style }}" data-material="{{ m.material }}" data-rooms="{{#each m.rooms as r}}{{ r }} {{/each}}" data-families="{{#each m.colorFamilies as f}}{{ f }} {{/each}}">
       <div class="model-card__media">
         <span class="model-card__badge">{{ m.availabilityLabel }}</span>
-        <img src="{{ m.cover }}" alt="Rideau {{ m.name }}, {{ m.styleName }}, monté et drapé sur tringle" loading="lazy" decoding="async" width="900" height="1125">
-        {{#if m.images.mockups.embrasse}}<img class="is-alt" data-src="{{ m.images.mockups.embrasse }}" alt="" decoding="async" width="900" height="1125">{{/if}}
+        <img src="{{ m.cover }}"{{#if m.coverSrcset}} srcset="{{ m.coverSrcset }}" sizes="{{ m.sizes }}"{{/if}} alt="Rideau {{ m.name }}, {{ m.styleName }}, monté et drapé sur tringle" loading="lazy" decoding="async" width="900" height="1125">
+        {{#if m.altSrc}}<img class="is-alt" data-src="{{ m.altSrc }}" alt="" decoding="async" width="900" height="1125">{{/if}}
         <span class="model-card__swatch" style="background-image:url('{{ m.images.swatch }}')" aria-hidden="true"></span>
       </div>
       <div class="model-card__body">

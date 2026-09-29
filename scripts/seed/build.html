@@ -84,6 +84,7 @@ window.buildFabric = (id) => {
   return { tile: webp(t, 0.82), sample: webp(sample(t), 0.8), analysis: analyzeFabric(t) };
 };
 
+// Chaque rendu en deux tailles : 900 px (écrans larges) et 480 px (mobiles, via srcset).
 window.buildMockups = async (id, render) => {
   await document.fonts.ready;
   const out = {};
@@ -92,7 +93,13 @@ window.buildMockups = async (id, render) => {
     c.width = 900;
     c.height = 1125;
     renderPresentoir(c, { texture: tile(id), ...render }, key);
-    out[key] = webp(c, 0.8);
+    const small = document.createElement('canvas');
+    small.width = 480;
+    small.height = 600;
+    const sctx = small.getContext('2d');
+    sctx.imageSmoothingQuality = 'high';
+    sctx.drawImage(c, 0, 0, 480, 600);
+    out[key] = { large: webp(c, 0.8), small: webp(small, 0.78) };
   }
   return out;
 };

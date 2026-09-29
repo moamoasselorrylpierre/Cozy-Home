@@ -1,20 +1,22 @@
 {
   "name": "cozy-home-by-fany",
   "version": "1.0.0",
-  "description": "Site vitrine & boutique de Cozy Home by Fany — rideaux sur mesure et relooking d'intérieur.",
+  "description": "Site vitrine & boutique de Cozy Home by Fany — rideaux sur mesure et relooking d'intérieur (Cloudflare Workers + D1 + R2).",
   "private": true,
   "type": "module",
-  "main": "server.js",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "start": "node server.js",
-    "dev": "NODE_ENV=development node --watch server.js",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "deploy": "wrangler deploy",
     "test": "node --test tests/*.test.js",
-    "admin:create": "node scripts/create-admin.js",
     "build:assets": "node scripts/build-assets.mjs",
     "maquettes": "node scripts/maquettes.mjs"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "wrangler": "^4.143.0"
+  }
 }

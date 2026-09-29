@@ -1,23 +1,24 @@
-// Tests d'intégration : pages publiques, API, sécurité de l'espace admin.
+// Tests d'intégration du Worker (wrangler dev, D1 et R2 locaux) : pages, API, sécurité de l'espace pro.
 // Lancement : npm test
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs/promises';
-import os from 'node:os';
-import path from 'node:path';
+import { startWorker } from './worker.js';
 
-const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'cozy-test-'));
-process.env.DATA_DIR = tmp;
-process.env.ADMIN_USER = 'fany';
-process.env.ADMIN_PASSWORD = 'Test-motdepasse-2026';
-process.env.NODE_ENV = 'test';
-
-const { startServer } = await import('../server/app.js');
-let server;
+let worker;
 let base;
 let cookie = '';
 
 const PNG_1PX = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+const PNG_BYTES = Buffer.from(PNG_1PX.split(',')[1], 'base64');
+
+async function uploadBytes(bytes, type, folder = 'modeles') {
+  const res = await fetch(`${base}/api/admin/uploads?folder=${folder}`, {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'CozyHome', Cookie: cookie, 'Content-Type': type },
+    body: bytes,
+  });
+  return { status: res.status, json: await res.json().catch(() => null) };
+}
 
 async function req(p, { method = 'GET', body, headers = {}, admin = false } = {}) {
   const res = await fetch(base + p, {
@@ -37,12 +38,11 @@ async function req(p, { method = 'GET', body, headers = {}, admin = false } = {}
 }
 
 before(async () => {
-  server = await startServer({ port: 0, host: '127.0.0.1', quiet: true });
-  base = `http://127.0.0.1:${server.address().port}`;
-});
+  worker = await startWorker({ vars: { ADMIN_USER: 'fany', ADMIN_PASSWORD: 'Test-motdepasse-2026' } });
+  base = worker.base;
+}, { timeout: 90000 });
 after(async () => {
-  server.close();
-  await fs.rm(tmp, { recursive: true, force: true });
+  await worker?.stop();
 });
 
 test('les pages publiques répondent avec les en-têtes de sécurité', async () => {
@@ -57,9 +57,10 @@ test('les pages publiques répondent avec les en-têtes de sécurité', async ()
 
 test('404 élégante et protection contre la traversée de répertoires', async () => {
   assert.equal((await req('/page-inconnue')).status, 404);
-  assert.equal((await req('/css/..%2f..%2fserver.js')).status, 404);
+  assert.equal((await req('/css/..%2f..%2fserver/app.js')).status, 404);
   assert.equal((await req('/js/../../package.json')).status, 404);
   assert.equal((await req('/uploads/..%2f..%2fusers.json')).status, 404);
+  assert.equal((await req('/uploads/modeles/2026-01/inexistant.webp')).status, 404);
 });
 
 test('SEO : robots.txt et sitemap.xml', async () => {
@@ -112,6 +113,7 @@ test('espace admin : refus sans session, sans en-tête anti-CSRF, ou avec mauvai
 test('espace admin : connexion, modèles, archivage, contenus, demandes', async () => {
   const login = await req('/api/admin/login', { method: 'POST', admin: true, body: { username: 'fany', password: 'Test-motdepasse-2026' } });
   assert.equal(login.status, 200);
+  assert.equal((await req('/api/admin/setup')).json.configured, true);
   const setCookie = login.headers.get('set-cookie');
   assert.match(setCookie, /HttpOnly/);
   assert.match(setCookie, /SameSite=Strict/);
@@ -119,11 +121,17 @@ test('espace admin : connexion, modèles, archivage, contenus, demandes', async 
   assert.equal((await req('/api/admin/me', { admin: true })).json.user.username, 'fany');
 
   // Téléversement : image valide acceptée, faux fichier refusé.
-  const up = await req('/api/admin/uploads', { method: 'POST', admin: true, body: { dataUrl: PNG_1PX, folder: 'modeles' } });
+  const up = await uploadBytes(PNG_BYTES, 'image/png');
   assert.equal(up.status, 201);
-  assert.equal((await fetch(base + up.json.url)).status, 200);
-  const fake = await req('/api/admin/uploads', { method: 'POST', admin: true, body: { dataUrl: 'data:image/png;base64,' + Buffer.from('<svg onload=alert(1)>').toString('base64') } });
+  assert.match(up.json.url, /^\/uploads\/modeles\/\d{4}-\d{2}\/[a-f0-9]{20}\.png$/);
+  const served = await fetch(base + up.json.url);
+  assert.equal(served.status, 200);
+  assert.equal(served.headers.get('content-type'), 'image/png');
+  assert.match(served.headers.get('cache-control'), /immutable/);
+  const fake = await uploadBytes(Buffer.from('<svg onload=alert(1)>'), 'image/png');
   assert.equal(fake.status, 400);
+  const tooBig = await uploadBytes(new Uint8Array(3 * 1024 * 1024 + 10), 'image/webp');
+  assert.equal(tooBig.status, 413);
 
   // Un modèle publié exige une photo de tissu.
   const noPhoto = await req('/api/admin/models', { method: 'POST', admin: true, body: { name: 'Sans photo', status: 'published' } });

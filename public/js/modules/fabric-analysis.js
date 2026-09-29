@@ -203,17 +203,66 @@ export function analyzeFabric(tile) {
   };
 }
 
-/** Encode un canvas/une image en data URL compressée (WebP, repli JPEG). */
-export function compress(source, { maxSide = 1600, quality = 0.84, type = 'image/webp' } = {}) {
+/**
+ * Profils de compression : taille maximale (côté le plus long) et poids visé pour chaque usage.
+ * Toutes les images passent par ici avant d'être envoyées : le site reste léger et rapide.
+ */
+export const IMAGE_PROFILES = {
+  photo: { maxSide: 1400, maxBytes: 170 * 1024, label: 'photo d’échantillon' },
+  swatch: { maxSide: 512, maxBytes: 90 * 1024, minQuality: 0.72, label: 'tissu (texture)' },
+  mockup: { maxSide: 1125, maxBytes: 130 * 1024, label: 'rendu' },
+  mockupSmall: { maxSide: 600, maxBytes: 45 * 1024, label: 'rendu mobile' },
+  content: { maxSide: 1800, maxBytes: 230 * 1024, label: 'image du site' },
+  portrait: { maxSide: 1200, maxBytes: 160 * 1024, label: 'portrait' },
+};
+
+function toCanvas(source, maxSide) {
   const { w, h } = sizeOf(source);
   const k = Math.min(1, maxSide / Math.max(w, h));
   const c = document.createElement('canvas');
-  c.width = Math.round(w * k);
-  c.height = Math.round(h * k);
+  c.width = Math.max(1, Math.round(w * k));
+  c.height = Math.max(1, Math.round(h * k));
   const ctx = c.getContext('2d');
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(source, 0, 0, c.width, c.height);
+  return c;
+}
+
+const toBlob = (canvas, type, quality) => new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+
+/**
+ * Compresse une image en WebP (repli JPEG) en visant un poids maximal :
+ * la qualité baisse par paliers, puis les dimensions si nécessaire.
+ * @returns {Promise<{blob: Blob, width: number, height: number, type: string}>}
+ */
+export async function encodeImage(source, profile = 'content') {
+  const p = typeof profile === 'string' ? IMAGE_PROFILES[profile] : profile;
+  const minQuality = p.minQuality ?? 0.6;
+  let side = p.maxSide;
+  let best = null;
+  for (let pass = 0; pass < 4; pass++) {
+    const canvas = toCanvas(source, side);
+    for (let q = p.quality ?? 0.86; q >= minQuality - 0.001; q -= 0.06) {
+      let blob = await toBlob(canvas, 'image/webp', q);
+      if (!blob || blob.type !== 'image/webp') blob = await toBlob(canvas, 'image/jpeg', q); // navigateurs sans encodeur WebP
+      if (!blob) continue;
+      best = { blob, width: canvas.width, height: canvas.height, type: blob.type };
+      if (blob.size <= p.maxBytes) return best;
+    }
+    side = Math.round(side * 0.82);
+  }
+  return best;
+}
+
+/** Encode un canvas/une image en data URL compressée (WebP, repli JPEG). */
+export function compress(source, { maxSide = 1600, quality = 0.84, type = 'image/webp' } = {}) {
+  const c = toCanvas(source, maxSide);
   let url = c.toDataURL(type, quality);
   if (!url.startsWith(`data:${type}`)) url = c.toDataURL('image/jpeg', quality); // navigateurs sans encodeur WebP
   return url;
+}
+
+export function formatBytes(n) {
+  if (n >= 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1).replace('.', ',')} Mo`;
+  return `${Math.max(1, Math.round(n / 1024))} Ko`;
 }

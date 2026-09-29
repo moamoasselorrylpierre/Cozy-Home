@@ -1,190 +1,101 @@
-// Utilitaires HTTP : réponses, lecture du corps, fichiers statiques compressés, en-têtes de sécurité.
-import fs from 'node:fs';
-import fsp from 'node:fs/promises';
-import path from 'node:path';
-import zlib from 'node:zlib';
-import { config, isDev } from './config.js';
+// Utilitaires HTTP (API Fetch des Workers) : réponses, lecture du corps, en-têtes de sécurité.
 
 export class HttpError extends Error {
-  constructor(status, message, details) {
+  constructor(status, message) {
     super(message);
     this.status = status;
-    this.details = details;
   }
 }
 
-const MIME = {
-  '.html': 'text/html; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.mjs': 'text/javascript; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.webp': 'image/webp',
-  '.avif': 'image/avif',
-  '.gif': 'image/gif',
-  '.ico': 'image/x-icon',
-  '.woff2': 'font/woff2',
-  '.txt': 'text/plain; charset=utf-8',
-  '.xml': 'application/xml; charset=utf-8',
-  '.webmanifest': 'application/manifest+json',
-  '.md': 'text/plain; charset=utf-8',
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'X-Frame-Options': 'DENY',
+  'Permissions-Policy': 'camera=(self), microphone=(), geolocation=(), payment=()',
+  'Content-Security-Policy': [
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self'",
+    "img-src 'self' data: blob:",
+    "connect-src 'self'",
+    'frame-src https://www.tiktok.com',
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'",
+  ].join('; '),
 };
-const COMPRESSIBLE = /^(text\/|application\/(json|javascript|xml|manifest\+json)|image\/svg)/;
 
-export function securityHeaders(res) {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('Permissions-Policy', 'camera=(self), microphone=(), geolocation=(), payment=()');
-  res.setHeader(
-    'Content-Security-Policy',
-    [
-      "default-src 'self'",
-      "script-src 'self'",
-      "style-src 'self' 'unsafe-inline'",
-      "font-src 'self'",
-      "img-src 'self' data: blob:",
-      "connect-src 'self'",
-      'frame-src https://www.tiktok.com',
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-      "object-src 'none'",
-    ].join('; '),
-  );
+export function withSecurity(headers = new Headers()) {
+  for (const [k, v] of Object.entries(SECURITY_HEADERS)) if (!headers.has(k)) headers.set(k, v);
+  return headers;
 }
 
-function acceptsGzip(req) {
-  return /\bgzip\b/.test(req.headers['accept-encoding'] || '');
+export function html(body, status = 200, extra = {}) {
+  const headers = withSecurity(new Headers({ 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache', ...extra }));
+  return new Response(body, { status, headers });
 }
 
-/** Envoie un corps texte/binaire avec compression gzip si pertinente. */
-export function send(req, res, status, body, type = 'text/html; charset=utf-8', extraHeaders = {}) {
-  const buf = Buffer.isBuffer(body) ? body : Buffer.from(String(body));
-  res.statusCode = status;
-  res.setHeader('Content-Type', type);
-  for (const [k, v] of Object.entries(extraHeaders)) res.setHeader(k, v);
-  if (buf.length > 1024 && COMPRESSIBLE.test(type) && acceptsGzip(req)) {
-    const gz = zlib.gzipSync(buf, { level: 6 });
-    res.setHeader('Content-Encoding', 'gzip');
-    res.setHeader('Vary', 'Accept-Encoding');
-    res.setHeader('Content-Length', gz.length);
-    res.end(req.method === 'HEAD' ? undefined : gz);
-  } else {
-    res.setHeader('Content-Length', buf.length);
-    res.end(req.method === 'HEAD' ? undefined : buf);
+export function text(body, type = 'text/plain; charset=utf-8', status = 200, extra = {}) {
+  return new Response(body, { status, headers: withSecurity(new Headers({ 'Content-Type': type, ...extra })) });
+}
+
+export function json(data, status = 200, extra = {}) {
+  const headers = withSecurity(new Headers({ 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }));
+  for (const [k, v] of Object.entries(extra)) {
+    if (Array.isArray(v)) v.forEach((x) => headers.append(k, x));
+    else headers.set(k, v);
   }
+  return new Response(JSON.stringify(data), { status, headers });
 }
 
-export function sendJSON(req, res, status, data, extraHeaders = {}) {
-  send(req, res, status, JSON.stringify(data), 'application/json; charset=utf-8', { 'Cache-Control': 'no-store', ...extraHeaders });
-}
-
-export function redirect(res, location, status = 302) {
-  res.statusCode = status;
-  res.setHeader('Location', location);
-  res.end();
+export function redirect(location, status = 302) {
+  return new Response(null, { status, headers: withSecurity(new Headers({ Location: location })) });
 }
 
 /** Lit un corps JSON avec limite de taille. */
-export function readJSON(req, limit = config.limits.jsonBody) {
-  return new Promise((resolve, reject) => {
-    const type = req.headers['content-type'] || '';
-    if (!type.includes('application/json')) return reject(new HttpError(415, 'Format attendu : JSON.'));
-    let size = 0;
-    const chunks = [];
-    req.on('data', (chunk) => {
-      size += chunk.length;
-      if (size > limit) {
-        reject(new HttpError(413, 'Contenu trop volumineux.'));
-        req.destroy();
-        return;
-      }
-      chunks.push(chunk);
-    });
-    req.on('end', () => {
-      try {
-        resolve(chunks.length ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : {});
-      } catch {
-        reject(new HttpError(400, 'JSON invalide.'));
-      }
-    });
-    req.on('error', reject);
-  });
+export async function readJSON(request, limit = 2 * 1024 * 1024) {
+  if (!(request.headers.get('content-type') || '').includes('application/json')) throw new HttpError(415, 'Format attendu : JSON.');
+  const declared = Number(request.headers.get('content-length') || 0);
+  if (declared > limit) throw new HttpError(413, 'Contenu trop volumineux.');
+  const buf = await request.arrayBuffer();
+  if (buf.byteLength > limit) throw new HttpError(413, 'Contenu trop volumineux.');
+  if (!buf.byteLength) return {};
+  try {
+    return JSON.parse(new TextDecoder().decode(buf));
+  } catch {
+    throw new HttpError(400, 'JSON invalide.');
+  }
 }
 
-const etagCache = new Map();
+/** Corps binaire (téléversement d'image) avec limite de taille. */
+export async function readBytes(request, limit) {
+  const declared = Number(request.headers.get('content-length') || 0);
+  if (declared > limit) throw new HttpError(413, 'Image trop volumineuse.');
+  const buf = new Uint8Array(await request.arrayBuffer());
+  if (!buf.byteLength) throw new HttpError(400, 'Fichier vide.');
+  if (buf.byteLength > limit) throw new HttpError(413, 'Image trop volumineuse.');
+  return buf;
+}
 
-/** Sert un fichier statique d'un dossier racine, sans sortie possible de ce dossier. */
-export async function serveStatic(req, res, rootDir, relPath, { immutable = false } = {}) {
-  let decoded;
-  try {
-    decoded = decodeURIComponent(relPath);
-  } catch {
-    return false;
-  }
-  if (decoded.includes('\0')) return false;
-  const filePath = path.resolve(rootDir, '.' + path.posix.normalize('/' + decoded));
-  if (!filePath.startsWith(rootDir + path.sep)) return false;
-  let stat;
-  try {
-    stat = await fsp.stat(filePath);
-  } catch {
-    return false;
-  }
-  if (!stat.isFile()) return false;
-  const ext = path.extname(filePath).toLowerCase();
-  const type = MIME[ext];
-  if (!type) return false;
+export const clientIp = (request) => request.headers.get('cf-connecting-ip') || request.headers.get('x-real-ip') || 'local';
 
-  const etag = `"${stat.size.toString(36)}-${stat.mtimeMs.toString(36)}"`;
-  res.setHeader('ETag', etag);
-  res.setHeader(
-    'Cache-Control',
-    isDev ? 'no-cache' : immutable ? 'public, max-age=31536000, immutable' : 'public, max-age=3600, must-revalidate',
-  );
-  if (req.headers['if-none-match'] === etag) {
-    res.statusCode = 304;
-    res.end();
-    return true;
-  }
-  if (COMPRESSIBLE.test(type)) {
-    const key = `${filePath}:${etag}`;
-    let body = etagCache.get(key);
-    if (!body) {
-      body = await fsp.readFile(filePath);
-      if (etagCache.size > 300) etagCache.clear();
-      etagCache.set(key, body);
+/** URL publique du site (variable SITE_URL, sinon origine de la requête). */
+export function siteUrl(request, env) {
+  const configured = String(env?.SITE_URL || '').replace(/\/+$/, '');
+  return configured || new URL(request.url).origin;
+}
+
+export function parseCookies(header = '') {
+  const out = {};
+  for (const part of String(header || '').split(';')) {
+    const i = part.indexOf('=');
+    if (i < 0) continue;
+    const k = part.slice(0, i).trim();
+    if (k) {
+      try { out[k] = decodeURIComponent(part.slice(i + 1).trim()); } catch { /* ignoré */ }
     }
-    send(req, res, 200, body, type);
-    return true;
   }
-  res.statusCode = 200;
-  res.setHeader('Content-Type', type);
-  res.setHeader('Content-Length', stat.size);
-  if (req.method === 'HEAD') { res.end(); return true; }
-  await new Promise((resolve, reject) => {
-    const stream = fs.createReadStream(filePath);
-    stream.on('error', reject);
-    stream.on('end', resolve);
-    stream.pipe(res);
-  });
-  return true;
-}
-
-export function clientIp(req) {
-  const fwd = req.headers['x-forwarded-for'];
-  if (process.env.TRUST_PROXY === 'true' && fwd) return String(fwd).split(',')[0].trim();
-  return req.socket.remoteAddress || 'inconnu';
-}
-
-/** URL publique du site (config ou déduite de la requête). */
-export function siteUrl(req) {
-  if (config.siteUrl) return config.siteUrl;
-  const proto = process.env.TRUST_PROXY === 'true' && req.headers['x-forwarded-proto'] ? req.headers['x-forwarded-proto'] : 'http';
-  return `${proto}://${req.headers.host || 'localhost'}`;
+  return out;
 }

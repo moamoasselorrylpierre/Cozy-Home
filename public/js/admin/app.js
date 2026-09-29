@@ -54,6 +54,12 @@ function renderLogin(message = '') {
     </main>`;
   const form = $('form', root);
   form.username.focus();
+  // Premier lancement : aucun compte tant que le secret ADMIN_PASSWORD n'est pas défini sur Cloudflare.
+  fetch('/api/admin/setup').then((r) => r.json()).then(({ configured }) => {
+    if (configured === false) {
+      $('.form__error', form).textContent = 'Aucun compte n’est encore configuré. Sur Cloudflare : Workers & Pages → cozy-home → Paramètres → Variables et secrets → ajoutez le secret ADMIN_PASSWORD, puis rechargez cette page.';
+    }
+  }).catch(() => {});
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = $('button', form);

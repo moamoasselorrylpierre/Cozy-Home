@@ -22,4 +22,18 @@ export async function api(path, { method = 'GET', body } = {}) {
   return data;
 }
 
-export const upload = (dataUrl, folder) => api('/uploads', { method: 'POST', body: { dataUrl, folder } }).then((r) => r.url);
+/** Téléverse une image déjà compressée (Blob) vers le stockage R2 ; renvoie son adresse. */
+export async function upload(blob, folder) {
+  const res = await fetch(`/api/admin/uploads?folder=${encodeURIComponent(folder)}`, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'X-Requested-With': 'CozyHome', 'Content-Type': blob.type || 'application/octet-stream' },
+    body: blob,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    if (res.status === 401) window.dispatchEvent(new CustomEvent('admin:unauthorized'));
+    throw new ApiError(res.status, data.error || 'Téléversement impossible.');
+  }
+  return data.url;
+}

@@ -55,6 +55,11 @@
         "ferme": "/img/mockups/voile-ivoire-ferme.webp",
         "miOuvert": "/img/mockups/voile-ivoire-mi-ouvert.webp",
         "embrasse": "/img/mockups/voile-ivoire-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/voile-ivoire-ferme-480.webp",
+        "miOuvert": "/img/mockups/voile-ivoire-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/voile-ivoire-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -64,8 +69,8 @@
       "contrast": 0.259
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo02",
@@ -127,6 +132,11 @@
         "ferme": "/img/mockups/gaze-rose-poudre-ferme.webp",
         "miOuvert": "/img/mockups/gaze-rose-poudre-mi-ouvert.webp",
         "embrasse": "/img/mockups/gaze-rose-poudre-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/gaze-rose-poudre-ferme-480.webp",
+        "miOuvert": "/img/mockups/gaze-rose-poudre-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/gaze-rose-poudre-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -136,8 +146,8 @@
       "contrast": 0.605
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo03",
@@ -183,6 +193,11 @@
         "ferme": "/img/mockups/velours-sapin-ferme.webp",
         "miOuvert": "/img/mockups/velours-sapin-mi-ouvert.webp",
         "embrasse": "/img/mockups/velours-sapin-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/velours-sapin-ferme-480.webp",
+        "miOuvert": "/img/mockups/velours-sapin-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/velours-sapin-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -192,8 +207,8 @@
       "contrast": 0.025
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo04",
@@ -240,6 +255,11 @@
         "ferme": "/img/mockups/velours-terracotta-ferme.webp",
         "miOuvert": "/img/mockups/velours-terracotta-mi-ouvert.webp",
         "embrasse": "/img/mockups/velours-terracotta-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/velours-terracotta-ferme-480.webp",
+        "miOuvert": "/img/mockups/velours-terracotta-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/velours-terracotta-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -249,8 +269,8 @@
       "contrast": 0.055
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo05",
@@ -313,6 +333,11 @@
         "ferme": "/img/mockups/lin-sable-ferme.webp",
         "miOuvert": "/img/mockups/lin-sable-mi-ouvert.webp",
         "embrasse": "/img/mockups/lin-sable-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/lin-sable-ferme-480.webp",
+        "miOuvert": "/img/mockups/lin-sable-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/lin-sable-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -322,8 +347,8 @@
       "contrast": 0.673
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo06",
@@ -386,6 +411,11 @@
         "ferme": "/img/mockups/bogolan-nuit-ferme.webp",
         "miOuvert": "/img/mockups/bogolan-nuit-mi-ouvert.webp",
         "embrasse": "/img/mockups/bogolan-nuit-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/bogolan-nuit-ferme-480.webp",
+        "miOuvert": "/img/mockups/bogolan-nuit-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/bogolan-nuit-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -395,8 +425,8 @@
       "contrast": 0.893
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo07",
@@ -459,6 +489,11 @@
         "ferme": "/img/mockups/rayure-riviera-ferme.webp",
         "miOuvert": "/img/mockups/rayure-riviera-mi-ouvert.webp",
         "embrasse": "/img/mockups/rayure-riviera-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/rayure-riviera-ferme-480.webp",
+        "miOuvert": "/img/mockups/rayure-riviera-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/rayure-riviera-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -468,8 +503,8 @@
       "contrast": 0.588
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo08",
@@ -533,6 +568,11 @@
         "ferme": "/img/mockups/wax-soleil-ferme.webp",
         "miOuvert": "/img/mockups/wax-soleil-mi-ouvert.webp",
         "embrasse": "/img/mockups/wax-soleil-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/wax-soleil-ferme-480.webp",
+        "miOuvert": "/img/mockups/wax-soleil-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/wax-soleil-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -542,8 +582,8 @@
       "contrast": 1
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo09",
@@ -605,6 +645,11 @@
         "ferme": "/img/mockups/toile-de-jouy-brique-ferme.webp",
         "miOuvert": "/img/mockups/toile-de-jouy-brique-mi-ouvert.webp",
         "embrasse": "/img/mockups/toile-de-jouy-brique-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/toile-de-jouy-brique-ferme-480.webp",
+        "miOuvert": "/img/mockups/toile-de-jouy-brique-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/toile-de-jouy-brique-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -614,8 +659,8 @@
       "contrast": 0.696
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo10",
@@ -666,6 +711,11 @@
         "ferme": "/img/mockups/damas-or-ferme.webp",
         "miOuvert": "/img/mockups/damas-or-mi-ouvert.webp",
         "embrasse": "/img/mockups/damas-or-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/damas-or-ferme-480.webp",
+        "miOuvert": "/img/mockups/damas-or-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/damas-or-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -675,8 +725,8 @@
       "contrast": 0.174
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo11",
@@ -739,6 +789,11 @@
         "ferme": "/img/mockups/broderie-camelia-ferme.webp",
         "miOuvert": "/img/mockups/broderie-camelia-mi-ouvert.webp",
         "embrasse": "/img/mockups/broderie-camelia-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/broderie-camelia-ferme-480.webp",
+        "miOuvert": "/img/mockups/broderie-camelia-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/broderie-camelia-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -748,8 +803,8 @@
       "contrast": 0.572
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo12",
@@ -807,6 +862,11 @@
         "ferme": "/img/mockups/voile-brode-plumetis-ferme.webp",
         "miOuvert": "/img/mockups/voile-brode-plumetis-mi-ouvert.webp",
         "embrasse": "/img/mockups/voile-brode-plumetis-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/voile-brode-plumetis-ferme-480.webp",
+        "miOuvert": "/img/mockups/voile-brode-plumetis-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/voile-brode-plumetis-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -816,8 +876,8 @@
       "contrast": 0.384
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo13",
@@ -880,6 +940,11 @@
         "ferme": "/img/mockups/macrame-naturel-ferme.webp",
         "miOuvert": "/img/mockups/macrame-naturel-mi-ouvert.webp",
         "embrasse": "/img/mockups/macrame-naturel-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/macrame-naturel-ferme-480.webp",
+        "miOuvert": "/img/mockups/macrame-naturel-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/macrame-naturel-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -889,8 +954,8 @@
       "contrast": 1
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo14",
@@ -954,6 +1019,11 @@
         "ferme": "/img/mockups/ikat-terre-ferme.webp",
         "miOuvert": "/img/mockups/ikat-terre-mi-ouvert.webp",
         "embrasse": "/img/mockups/ikat-terre-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/ikat-terre-ferme-480.webp",
+        "miOuvert": "/img/mockups/ikat-terre-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/ikat-terre-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -963,8 +1033,8 @@
       "contrast": 0.797
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo15",
@@ -1025,6 +1095,11 @@
         "ferme": "/img/mockups/zellige-azur-ferme.webp",
         "miOuvert": "/img/mockups/zellige-azur-mi-ouvert.webp",
         "embrasse": "/img/mockups/zellige-azur-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/zellige-azur-ferme-480.webp",
+        "miOuvert": "/img/mockups/zellige-azur-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/zellige-azur-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -1034,8 +1109,8 @@
       "contrast": 1
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   },
   {
     "id": "mod_demo16",
@@ -1097,6 +1172,11 @@
         "ferme": "/img/mockups/palmes-tropicales-ferme.webp",
         "miOuvert": "/img/mockups/palmes-tropicales-mi-ouvert.webp",
         "embrasse": "/img/mockups/palmes-tropicales-embrasse.webp"
+      },
+      "mockupsSmall": {
+        "ferme": "/img/mockups/palmes-tropicales-ferme-480.webp",
+        "miOuvert": "/img/mockups/palmes-tropicales-mi-ouvert-480.webp",
+        "embrasse": "/img/mockups/palmes-tropicales-embrasse-480.webp"
       }
     },
     "analysis": {
@@ -1106,7 +1186,7 @@
       "contrast": 1
     },
     "demo": true,
-    "createdAt": "2026-09-29T09:50:38.306Z",
-    "updatedAt": "2026-09-29T09:50:38.306Z"
+    "createdAt": "2026-09-29T13:44:35.319Z",
+    "updatedAt": "2026-09-29T13:44:35.319Z"
   }
 ]

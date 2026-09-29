@@ -10,62 +10,51 @@ Un portfolio-boutique interactif en deux espaces :
   **génération automatique des mock-ups** (rideau plissé et suspendu), archivage, textes et images du site,
   cartels de la galerie, suivi des demandes, gestion de l’équipe.
 
-## Démarrer
+## Hébergement : 100 % Cloudflare
 
-Prérequis : **Node.js 20 ou plus récent**. Aucune dépendance à installer.
+| Élément | Service |
+|---|---|
+| Pages, espace pro, formulaires | Cloudflare **Workers** |
+| Modèles, textes, demandes, comptes | Cloudflare **D1** (base de données) |
+| Images déposées depuis l’espace pro | Cloudflare **R2** |
+| CSS, scripts, polices, visuels | **Static Assets** |
+
+La base D1 et le stockage R2 sont créés automatiquement au premier déploiement.
+👉 Pas à pas : **[docs/DEPLOIEMENT-CLOUDFLARE.md](docs/DEPLOIEMENT-CLOUDFLARE.md)**
+(import du dépôt GitHub depuis le tableau de bord Cloudflare, sans rien installer).
+
+Le compte de Fany (`fany`) est créé à partir du secret **`ADMIN_PASSWORD`** défini dans les paramètres du Worker.
+
+## Développement local
+
+Prérequis : Node.js 20 ou plus récent.
 
 ```bash
-npm start            # http://localhost:3000
+npm install
+cp .dev.vars.example .dev.vars   # puis renseigner ADMIN_PASSWORD
+npm run dev                      # http://localhost:8787 (D1 et R2 simulés localement)
+npm test                         # tests d'intégration sur le Worker local
+npm run deploy                   # déploiement avec Wrangler (compte Cloudflare connecté via « npx wrangler login »)
+npm run build:assets             # régénère les visuels de démonstration (Playwright + Chromium)
+npm run maquettes                # régénère les captures de docs/maquettes
 ```
 
-Au premier démarrage, le compte de Fany est créé et ses identifiants s’affichent **une seule fois** dans la console :
+## Configuration
 
-```
- Compte administrateur créé (Espace pro → /admin)
-   Identifiant  : fany
-   Mot de passe : Cozy-xxxxxxxx-42
-```
-
-Pour choisir soi-même les identifiants, définir `ADMIN_USER` et `ADMIN_PASSWORD` avant le premier démarrage, ou
-utiliser : `npm run admin:create -- <identifiant> "<mot de passe>" [Nom] [--proprietaire]` (crée ou réinitialise un compte).
-
-## Configuration (variables d’environnement)
-
-| Variable | Rôle | Défaut |
+| Nom | Type | Rôle |
 |---|---|---|
-| `PORT` / `HOST` | Port et interface d’écoute | `3000` / `0.0.0.0` |
-| `SITE_URL` | URL publique (canonique, sitemap, partages), ex. `https://cozyhomebyfany.com` | déduite de la requête |
-| `DATA_DIR` | Dossier des données (JSON) et des images téléversées | `./data` |
-| `UPLOAD_DIR` | Dossier des images téléversées | `$DATA_DIR/uploads` |
-| `ADMIN_USER` / `ADMIN_PASSWORD` | Compte créé au premier démarrage | `fany` / mot de passe aléatoire |
-| `SECURE_COOKIES` | Cookie de session `Secure` (HTTPS) | activé si `SITE_URL` est en https |
-| `TRUST_PROXY` | `true` derrière un proxy (Nginx, Render…) pour l’IP et le protocole réels | `false` |
-
-## Mise en ligne
-
-Hébergement Node.js classique (VPS, Render, Railway, Fly.io, o2switch…) **avec disque persistant** pour `DATA_DIR`
-(les modèles, contenus, demandes et images y sont enregistrés). Exemple :
-
-```bash
-SITE_URL=https://cozyhomebyfany.com TRUST_PROXY=true DATA_DIR=/var/lib/cozyhome npm start
-```
-
-Placer le site derrière HTTPS. Sauvegarder régulièrement le dossier `DATA_DIR`.
-
-## Développement
-
-```bash
-npm run dev             # redémarrage automatique, cache désactivé
-npm test                # tests d'intégration (API, sécurité, rendu)
-npm run build:assets    # régénère les visuels de démonstration (nécessite Playwright + Chromium)
-npm run maquettes       # régénère les captures d'écran de docs/maquettes
-```
+| `ADMIN_PASSWORD` | secret | Mot de passe du compte `fany` (création au premier accès). |
+| `ADMIN_PASSWORD_RESET` | secret | Réinitialise le mot de passe oublié (à supprimer ensuite). |
+| `ADMIN_USER` | variable | Identifiant du compte propriétaire (`fany`). |
+| `SITE_URL` | variable | Adresse officielle (domaine personnalisé) pour le SEO. |
+| `PASSWORD_ITERATIONS` | variable | Coût du hachage des mots de passe (50 000 par défaut). |
 
 ## Documentation
 
 - [docs/PLAN-DU-SITE.md](docs/PLAN-DU-SITE.md) — arborescence complète du site
 - [docs/MAQUETTES.md](docs/MAQUETTES.md) — maquettes des pages clés (captures desktop & mobile)
 - [docs/GUIDE-ADMIN.md](docs/GUIDE-ADMIN.md) — guide d’utilisation de l’espace pro pour Fany et son équipe
+- [docs/DEPLOIEMENT-CLOUDFLARE.md](docs/DEPLOIEMENT-CLOUDFLARE.md) — mise en ligne sur Cloudflare, domaine, sauvegardes
 - [docs/TECHNIQUE.md](docs/TECHNIQUE.md) — architecture, structure des données, modules indépendants
 
 > Les 16 tissus livrés sont des **modèles de démonstration** (visuels générés, prix indicatifs) destinés à être

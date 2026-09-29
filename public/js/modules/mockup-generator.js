@@ -1,7 +1,7 @@
 // Module « génération automatique de mock-up » (6.2) : photo d'échantillon → tuile raccordable →
 // analyse → trois rendus de présentation (fermé, mi-ouvert, avec embrasses) dans le présentoir.
 // Façade indépendante : l'espace admin n'appelle que ce module ; le moteur peut être remplacé.
-import { cropToTile, makeSeamless, analyzeFabric, compress } from './fabric-analysis.js';
+import { cropToTile, makeSeamless, analyzeFabric, encodeImage } from './fabric-analysis.js';
 import { renderPresentoir, PRESENTOIR_STATES } from './curtain-render.js';
 
 export { PRESENTOIR_STATES };
@@ -28,7 +28,14 @@ export async function generateMockups(tile, render, { width = MOCKUP_SIZE.width 
   });
 }
 
-/** Encode les rendus pour le téléversement. */
-export function encodeMockups(mockups, quality = 0.8) {
-  return Object.fromEntries(mockups.map((m) => [m.key, compress(m.canvas, { maxSide: 1200, quality })]));
+/** Encode chaque rendu en deux versions compressées : grande (900 px) et légère pour mobile (480 px). */
+export async function encodeMockups(mockups) {
+  const out = {};
+  for (const m of mockups) {
+    out[m.key] = {
+      large: await encodeImage(m.canvas, 'mockup'),
+      small: await encodeImage(m.canvas, 'mockupSmall'),
+    };
+  }
+  return out;
 }

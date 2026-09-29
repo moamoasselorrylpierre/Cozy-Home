@@ -6,7 +6,7 @@ import { html, raw, $, $$, toast, setBusy, confirmDialog } from '../ui.js';
 import {
   ROOMS, MATERIALS, COLOR_FAMILIES, AVAILABILITY, HEADINGS, FINISHES, HEMS, PRICE_UNITS, STYLE_IDS, labelOf,
 } from '../../shared/taxonomy.js';
-import { readImageFile, autoCrop, sizeOf, compress } from '../../modules/fabric-analysis.js';
+import { readImageFile, autoCrop, sizeOf, encodeImage, formatBytes } from '../../modules/fabric-analysis.js';
 import { prepareFabric, generateMockups, encodeMockups } from '../../modules/mockup-generator.js';
 import { nameColor, colorFamily } from '../../modules/color.js';
 
@@ -350,22 +350,33 @@ export async function render(el, { params }) {
     const buttons = $$('.editor-actions button', form);
     buttons.forEach((b) => setBusy(b, true, 'Patientez…'));
     try {
-      const images = existing?.images ? structuredClone(existing.images) : { original: '', swatch: '', mockups: {} };
+      let optimised = '';
+      const images = existing?.images ? structuredClone(existing.images) : { original: '', swatch: '', mockups: {}, mockupsSmall: {} };
+      images.mockups ||= {};
+      images.mockupsSmall ||= {};
       if (st.imagesDirty && st.tile) {
         if (!st.mockups) await regenerate({ analyse: false });
+        // Compression avant envoi : chaque image vise un poids maximal (voir IMAGE_PROFILES).
+        statusEl.textContent = 'Compression des images…';
         const hd = await generateMockups(st.tile, st.render, { width: 900 });
-        const encoded = encodeMockups(hd);
+        const encoded = await encodeMockups(hd);
         const jobs = [];
-        if (st.image) jobs.push(['original', compress(st.image, { maxSide: 1600, quality: 0.85 })]);
-        jobs.push(['swatch', compress(st.tile, { maxSide: 512, quality: 0.84 })]);
-        for (const [k, v] of Object.entries(encoded)) jobs.push([`mockup:${k}`, v]);
+        if (st.image) jobs.push(['original', await encodeImage(st.image, 'photo')]);
+        jobs.push(['swatch', await encodeImage(st.tile, 'swatch')]);
+        for (const [k, v] of Object.entries(encoded)) {
+          jobs.push([`mockup:${k}`, v.large], [`small:${k}`, v.small]);
+        }
+        const total = jobs.reduce((sum, [, j]) => sum + j.blob.size, 0);
+        const source = st.file?.size || 0;
         let n = 0;
-        for (const [key, dataUrl] of jobs) {
+        for (const [key, job] of jobs) {
           statusEl.textContent = `Envoi des images ${++n}/${jobs.length}…`;
-          const url = await upload(dataUrl, key.startsWith('mockup') ? 'maquettes' : 'modeles');
+          const url = await upload(job.blob, key === 'original' || key === 'swatch' ? 'modeles' : 'maquettes');
           if (key.startsWith('mockup:')) images.mockups[key.split(':')[1]] = url;
+          else if (key.startsWith('small:')) images.mockupsSmall[key.split(':')[1]] = url;
           else images[key] = url;
         }
+        optimised = ` Images optimisées : ${formatBytes(total)} au total${source ? ` (photo d’origine : ${formatBytes(source)})` : ''}.`;
       }
       const amount = form.priceAmount.value.trim();
       const body = {
@@ -390,7 +401,7 @@ export async function render(el, { params }) {
         ? (await api(`/models/${existing.id}`, { method: 'PUT', body })).model
         : (await api('/models', { method: 'POST', body })).model;
       markDirty(false);
-      toast(status === 'published' ? `« ${saved.name} » est en ligne ✓` : `« ${saved.name} » enregistré en brouillon.`);
+      toast((status === 'published' ? `« ${saved.name} » est en ligne ✓` : `« ${saved.name} » enregistré en brouillon.`) + optimised, 6000);
       location.hash = '#/modeles';
     } catch (err) {
       errorEl.textContent = err.message;

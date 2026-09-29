@@ -1,123 +1,118 @@
 // API de l'espace administrateur (staff uniquement).
-import { read, update, write, newId } from './store.js';
-import { sendJSON, readJSON, HttpError, clientIp } from './http.js';
+import { all, get, put, remove, update, newId, getContent, setContent, seedContentReference } from './db.js';
+import { json, readJSON, readBytes, HttpError, clientIp } from './http.js';
 import {
   currentUser, verifyPassword, createSession, destroySession, sessionCookie, clearSessionCookie, sessionToken,
   loginBlocked, recordLoginFailure, clearLoginFailures, publicUser, upsertUser, validatePasswordStrength,
-  destroyUserSessions, hashPassword,
+  destroyUserSessions, hashPassword, ensureOwnerAccount, needsRehash,
 } from './auth.js';
-import {
-  sanitizeModel, sanitizeStyle, sanitizeContent, saveDataUrlImage, uniqueSlug, str, REQUEST_STATUS_IDS,
-} from './domain.js';
-import { config } from './config.js';
-import fs from 'node:fs';
-import path from 'node:path';
+import { sanitizeModel, sanitizeStyle, sanitizeContent, uniqueSlug, str, REQUEST_STATUS_IDS } from './domain.js';
+import { saveImage, MAX_UPLOAD_BYTES } from './media.js';
 
 /**
  * Protection CSRF : les appels d'administration doivent venir du site lui-même
  * (en-tête personnalisé + origine identique). Le cookie est aussi SameSite=Strict.
  */
-function checkCsrf(req) {
-  if (req.method === 'GET' || req.method === 'HEAD') return;
-  if (req.headers['x-requested-with'] !== 'CozyHome') throw new HttpError(403, 'Requête refusée.');
-  const origin = req.headers.origin;
+function checkCsrf(c) {
+  if (c.req.method === 'GET' || c.req.method === 'HEAD') return;
+  if (c.req.headers.get('x-requested-with') !== 'CozyHome') throw new HttpError(403, 'Requête refusée.');
+  const origin = c.req.headers.get('origin');
   if (origin) {
     let host;
     try { host = new URL(origin).host; } catch { throw new HttpError(403, 'Origine refusée.'); }
-    const expected = req.headers['x-forwarded-host'] && process.env.TRUST_PROXY === 'true' ? req.headers['x-forwarded-host'] : req.headers.host;
-    if (host !== expected) throw new HttpError(403, 'Origine refusée.');
+    if (host !== c.url.host) throw new HttpError(403, 'Origine refusée.');
   }
 }
 
-function requireUser(req, role) {
-  checkCsrf(req);
-  const user = currentUser(req);
+async function requireUser(c, role) {
+  checkCsrf(c);
+  const user = await currentUser(c.db, c.req);
   if (!user) throw new HttpError(401, 'Session expirée : merci de vous reconnecter.');
   if (role === 'owner' && user.role !== 'owner') throw new HttpError(403, 'Action réservée à la propriétaire du compte.');
   return user;
 }
 
-const guard = (handler, role) => async (req, res, ctx) => handler(req, res, { ...ctx, user: requireUser(req, role) });
-
-function seedContentReference() {
-  const file = path.join(config.seedDir, 'content.json');
-  return JSON.parse(fs.readFileSync(file, 'utf8'));
-}
+const guard = (handler, role) => async (c) => handler({ ...c, user: await requireUser(c, role) });
+const secure = (c) => c.url.protocol === 'https:';
 
 export function registerAdminApi(router) {
   // --- Session ---
-  router.post('/api/admin/login', async (req, res) => {
-    checkCsrf(req);
-    const ip = clientIp(req);
-    if (loginBlocked(ip)) throw new HttpError(429, 'Trop de tentatives. Réessayez dans 15 minutes.');
-    const body = await readJSON(req, 4096);
+  router.post('/api/admin/login', async (c) => {
+    checkCsrf(c);
+    const ip = clientIp(c.req);
+    if (await loginBlocked(c.db, ip)) throw new HttpError(429, 'Trop de tentatives. Réessayez dans 15 minutes.');
+    if (!(await ensureOwnerAccount(c.db, c.env))) {
+      throw new HttpError(503, 'Aucun compte n’est encore configuré : ajoutez le secret ADMIN_PASSWORD dans les paramètres du Worker sur Cloudflare (voir docs/DEPLOIEMENT-CLOUDFLARE.md).');
+    }
+    const body = await readJSON(c.req, 4096);
     const username = str(body.username, 40).toLowerCase();
     const password = String(body.password || '').slice(0, 200);
-    const user = read('users').find((u) => u.username === username);
+    const user = (await all(c.db, 'users')).find((u) => u.username === username);
     // Vérification systématique pour un temps de réponse homogène.
-    const ok = await verifyPassword(password, user?.passwordHash || 'scrypt$AAAAAAAAAAAAAAAAAAAAAA==$' + 'A'.repeat(86) + '==');
+    const ok = await verifyPassword(password, user?.passwordHash);
     if (!user || !ok) {
-      recordLoginFailure(ip);
+      await recordLoginFailure(c.db, ip);
       throw new HttpError(401, 'Identifiant ou mot de passe incorrect.');
     }
-    clearLoginFailures(ip);
-    const { token, expiresAt } = await createSession(user.id);
-    await update('users', (users) => users.map((u) => (u.id === user.id ? { ...u, lastLoginAt: new Date().toISOString() } : u)));
-    sendJSON(req, res, 200, { user: publicUser(user) }, { 'Set-Cookie': sessionCookie(token, expiresAt) });
+    await clearLoginFailures(c.db, ip);
+    const { token, expiresAt } = await createSession(c.db, user.id);
+    const passwordHash = needsRehash(user.passwordHash) ? await hashPassword(password) : user.passwordHash;
+    await put(c.db, 'users', { ...user, passwordHash, lastLoginAt: new Date().toISOString() });
+    return json({ user: publicUser(user) }, 200, { 'Set-Cookie': sessionCookie(token, expiresAt, secure(c)) });
   });
 
-  router.post('/api/admin/logout', async (req, res) => {
-    checkCsrf(req);
-    await destroySession(sessionToken(req));
-    sendJSON(req, res, 200, { ok: true }, { 'Set-Cookie': clearSessionCookie() });
+  router.post('/api/admin/logout', async (c) => {
+    checkCsrf(c);
+    await destroySession(c.db, sessionToken(c.req));
+    return json({ ok: true }, 200, { 'Set-Cookie': clearSessionCookie(secure(c)) });
   });
 
-  router.get('/api/admin/me', guard((req, res, { user }) => sendJSON(req, res, 200, { user: publicUser(user) })));
+  router.get('/api/admin/me', guard((c) => json({ user: publicUser(c.user) })));
 
-  router.post('/api/admin/password', guard(async (req, res, { user }) => {
-    const body = await readJSON(req, 4096);
-    const current = users().find((u) => u.id === user.id);
+  // Indique à l'écran de connexion si un compte a bien été configuré (secret ADMIN_PASSWORD).
+  router.get('/api/admin/setup', async (c) => json({ configured: await ensureOwnerAccount(c.db, c.env) }));
+
+  router.post('/api/admin/password', guard(async (c) => {
+    const body = await readJSON(c.req, 4096);
+    const current = await get(c.db, 'users', c.user.id);
     if (!(await verifyPassword(String(body.current || ''), current.passwordHash))) throw new HttpError(400, 'Mot de passe actuel incorrect.');
     const problem = validatePasswordStrength(body.next);
     if (problem) throw new HttpError(400, problem);
-    const passwordHash = await hashPassword(body.next);
-    await update('users', (list) => list.map((u) => (u.id === user.id ? { ...u, passwordHash } : u)));
-    await destroyUserSessions(user.id, sessionToken(req));
-    sendJSON(req, res, 200, { ok: true });
+    await put(c.db, 'users', { ...current, passwordHash: await hashPassword(body.next) });
+    await destroyUserSessions(c.db, c.user.id, sessionToken(c.req));
+    return json({ ok: true });
   }));
 
   // --- Équipe (réservé à la propriétaire) ---
-  const users = () => read('users');
-  router.get('/api/admin/users', guard((req, res) => sendJSON(req, res, 200, { users: users().map(publicUser) }), 'owner'));
-  router.post('/api/admin/users', guard(async (req, res) => {
-    const body = await readJSON(req, 4096);
+  router.get('/api/admin/users', guard(async (c) => json({ users: (await all(c.db, 'users')).map(publicUser) }), 'owner'));
+  router.post('/api/admin/users', guard(async (c) => {
+    const body = await readJSON(c.req, 4096);
     const problem = validatePasswordStrength(body.password);
     if (problem) throw new HttpError(400, problem);
-    if (users().some((u) => u.username === str(body.username, 40).toLowerCase())) throw new HttpError(409, 'Cet identifiant existe déjà.');
+    if ((await all(c.db, 'users')).some((u) => u.username === str(body.username, 40).toLowerCase())) throw new HttpError(409, 'Cet identifiant existe déjà.');
     let saved;
     try {
-      saved = await upsertUser({ username: body.username, password: body.password, name: str(body.name, 60), role: 'staff' });
+      saved = await upsertUser(c.db, { username: body.username, password: body.password, name: str(body.name, 60), role: 'staff' });
     } catch (err) {
       throw new HttpError(400, err.message);
     }
-    sendJSON(req, res, 201, { user: publicUser(saved) });
+    return json({ user: publicUser(saved) }, 201);
   }, 'owner'));
-  router.delete('/api/admin/users/:id', guard(async (req, res, { params, user }) => {
-    if (params.id === user.id) throw new HttpError(400, 'Vous ne pouvez pas supprimer votre propre compte.');
-    const target = users().find((u) => u.id === params.id);
+  router.delete('/api/admin/users/:id', guard(async (c) => {
+    if (c.params.id === c.user.id) throw new HttpError(400, 'Vous ne pouvez pas supprimer votre propre compte.');
+    const target = await get(c.db, 'users', c.params.id);
     if (!target) throw new HttpError(404, 'Compte introuvable.');
     if (target.role === 'owner') throw new HttpError(400, 'Le compte propriétaire ne peut pas être supprimé.');
-    await update('users', (list) => list.filter((u) => u.id !== params.id));
-    await destroyUserSessions(params.id);
-    sendJSON(req, res, 200, { ok: true });
+    await remove(c.db, 'users', c.params.id);
+    await destroyUserSessions(c.db, c.params.id);
+    return json({ ok: true });
   }, 'owner'));
 
   // --- Tableau de bord ---
-  router.get('/api/admin/stats', guard((req, res) => {
-    const models = read('models');
-    const requests = read('requests');
+  router.get('/api/admin/stats', guard(async (c) => {
+    const [models, requests] = await Promise.all([all(c.db, 'models'), all(c.db, 'requests')]);
     const by = (list, key) => list.reduce((acc, x) => ({ ...acc, [x[key]]: (acc[x[key]] || 0) + 1 }), {});
-    sendJSON(req, res, 200, {
+    return json({
       models: by(models, 'status'),
       requests: by(requests, 'status'),
       requestTypes: by(requests.filter((r) => r.status !== 'archive'), 'type'),
@@ -125,108 +120,88 @@ export function registerAdminApi(router) {
     });
   }));
 
-  // --- Téléversement d'images ---
-  router.post('/api/admin/uploads', guard(async (req, res) => {
-    const body = await readJSON(req);
-    const folder = ['modeles', 'contenus', 'maquettes'].includes(body.folder) ? body.folder : 'contenus';
-    const url = await saveDataUrlImage(body.dataUrl, folder);
-    sendJSON(req, res, 201, { url });
+  // --- Téléversement d'images (déjà compressées par le navigateur) → R2 ---
+  router.post('/api/admin/uploads', guard(async (c) => {
+    const bytes = await readBytes(c.req, MAX_UPLOAD_BYTES);
+    const url = await saveImage(c.env.MEDIA, bytes, c.query.get('folder') || 'contenus');
+    return json({ url, bytes: bytes.length }, 201);
   }));
 
   // --- Modèles ---
-  router.get('/api/admin/models', guard((req, res) => {
-    const list = read('models').sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
-    sendJSON(req, res, 200, { models: list });
-  }));
-  router.get('/api/admin/models/:id', guard((req, res, { params }) => {
-    const m = read('models').find((x) => x.id === params.id);
+  router.get('/api/admin/models', guard(async (c) => json({ models: await all(c.db, 'models') })));
+  router.get('/api/admin/models/:id', guard(async (c) => {
+    const m = await get(c.db, 'models', c.params.id);
     if (!m) throw new HttpError(404, 'Modèle introuvable.');
-    sendJSON(req, res, 200, { model: m });
+    return json({ model: m });
   }));
-  router.post('/api/admin/models', guard(async (req, res) => {
-    const body = await readJSON(req, 256 * 1024);
-    let created;
-    await update('models', (models) => {
-      const m = sanitizeModel(body, {});
-      const now = new Date().toISOString();
-      created = { id: newId('mod'), ...m, slug: uniqueSlug(body.slug || m.name, models), createdAt: now, updatedAt: now };
-      return [...models, created];
-    });
-    sendJSON(req, res, 201, { model: created });
+  router.post('/api/admin/models', guard(async (c) => {
+    const body = await readJSON(c.req, 256 * 1024);
+    const models = await all(c.db, 'models');
+    const m = sanitizeModel(body, {});
+    const now = new Date().toISOString();
+    const created = { id: newId('mod'), ...m, slug: uniqueSlug(body.slug || m.name, models), createdAt: now, updatedAt: now };
+    await put(c.db, 'models', created);
+    return json({ model: created }, 201);
   }));
-  router.put('/api/admin/models/:id', guard(async (req, res, { params }) => {
-    const body = await readJSON(req, 256 * 1024);
-    let saved;
-    await update('models', (models) => {
-      const i = models.findIndex((m) => m.id === params.id);
-      if (i < 0) throw new HttpError(404, 'Modèle introuvable.');
-      const m = sanitizeModel(body, models[i]);
-      if (body.slug !== undefined || body.name !== undefined) m.slug = uniqueSlug(body.slug || models[i].slug || m.name, models, params.id);
-      m.updatedAt = new Date().toISOString();
-      // Un modèle de démonstration dont on remplace la photo devient un vrai modèle de l'atelier.
-      if (m.demo && m.images?.swatch !== models[i].images?.swatch) delete m.demo;
-      if (m.status === 'archived' && models[i].status !== 'archived') m.archivedAt = m.updatedAt;
-      models[i] = m;
-      saved = m;
-      return models;
-    });
-    sendJSON(req, res, 200, { model: saved });
+  router.put('/api/admin/models/:id', guard(async (c) => {
+    const body = await readJSON(c.req, 256 * 1024);
+    const models = await all(c.db, 'models');
+    const before = models.find((m) => m.id === c.params.id);
+    if (!before) throw new HttpError(404, 'Modèle introuvable.');
+    const m = sanitizeModel(body, before);
+    if (body.slug !== undefined || body.name !== undefined) m.slug = uniqueSlug(body.slug || before.slug || m.name, models, c.params.id);
+    m.updatedAt = new Date().toISOString();
+    // Un modèle de démonstration dont on remplace la photo devient un vrai modèle de l'atelier.
+    if (m.demo && m.images?.swatch !== before.images?.swatch) delete m.demo;
+    if (m.status === 'archived' && before.status !== 'archived') m.archivedAt = m.updatedAt;
+    await put(c.db, 'models', m);
+    return json({ model: m });
   }));
-  router.delete('/api/admin/models/:id', guard(async (req, res, { params }) => {
-    let found = false;
-    await update('models', (models) => models.filter((m) => (m.id === params.id ? ((found = true), false) : true)));
-    if (!found) throw new HttpError(404, 'Modèle introuvable.');
-    sendJSON(req, res, 200, { ok: true });
+  router.delete('/api/admin/models/:id', guard(async (c) => {
+    if (!(await remove(c.db, 'models', c.params.id))) throw new HttpError(404, 'Modèle introuvable.');
+    return json({ ok: true });
   }));
 
   // --- Salles de la galerie (cartels) ---
-  router.get('/api/admin/styles', guard((req, res) => sendJSON(req, res, 200, { styles: read('styles').sort((a, b) => a.order - b.order) })));
-  router.put('/api/admin/styles/:id', guard(async (req, res, { params }) => {
-    const body = await readJSON(req, 64 * 1024);
-    let saved;
-    await update('styles', (styles) => {
-      const i = styles.findIndex((s) => s.id === params.id);
-      if (i < 0) throw new HttpError(404, 'Style introuvable.');
-      styles[i] = saved = sanitizeStyle(body, styles[i]);
-      return styles;
-    });
-    sendJSON(req, res, 200, { style: saved });
+  router.get('/api/admin/styles', guard(async (c) => json({ styles: await all(c.db, 'styles') })));
+  router.put('/api/admin/styles/:id', guard(async (c) => {
+    const body = await readJSON(c.req, 64 * 1024);
+    const style = await get(c.db, 'styles', c.params.id);
+    if (!style) throw new HttpError(404, 'Style introuvable.');
+    const saved = sanitizeStyle(body, style);
+    await put(c.db, 'styles', saved);
+    return json({ style: saved });
   }));
 
   // --- Contenus du site ---
-  router.get('/api/admin/content', guard((req, res) => sendJSON(req, res, 200, { content: read('content') })));
-  router.put('/api/admin/content', guard(async (req, res) => {
-    const body = await readJSON(req, 512 * 1024);
+  router.get('/api/admin/content', guard(async (c) => json({ content: await getContent(c.db) })));
+  router.put('/api/admin/content', guard(async (c) => {
+    const body = await readJSON(c.req, 512 * 1024);
     const clean = sanitizeContent(body.content, seedContentReference());
-    await write('content', clean);
-    sendJSON(req, res, 200, { content: clean });
+    await setContent(c.db, clean);
+    return json({ content: clean });
   }));
 
   // --- Demandes ---
-  router.get('/api/admin/requests', guard((req, res) => sendJSON(req, res, 200, { requests: read('requests') })));
-  router.patch('/api/admin/requests/:id', guard(async (req, res, { params, user }) => {
-    const body = await readJSON(req, 64 * 1024);
-    let saved;
-    await update('requests', (list) => {
-      const r = list.find((x) => x.id === params.id);
-      if (!r) throw new HttpError(404, 'Demande introuvable.');
-      const now = new Date().toISOString();
-      if (body.status !== undefined) {
-        if (!REQUEST_STATUS_IDS.has(body.status)) throw new HttpError(400, 'Statut inconnu.');
-        if (body.status !== r.status) (r.history ||= []).push({ at: now, status: body.status, by: user.name || user.username });
-        r.status = body.status;
-      }
-      if (body.notes !== undefined) r.notes = str(body.notes, 5000);
-      r.updatedAt = now;
-      saved = r;
-      return list;
-    });
-    sendJSON(req, res, 200, { request: saved });
+  router.get('/api/admin/requests', guard(async (c) => json({ requests: await all(c.db, 'requests') })));
+  router.patch('/api/admin/requests/:id', guard(async (c) => {
+    const body = await readJSON(c.req, 64 * 1024);
+    const r = await get(c.db, 'requests', c.params.id);
+    if (!r) throw new HttpError(404, 'Demande introuvable.');
+    const now = new Date().toISOString();
+    if (body.status !== undefined) {
+      if (!REQUEST_STATUS_IDS.has(body.status)) throw new HttpError(400, 'Statut inconnu.');
+      if (body.status !== r.status) (r.history ||= []).push({ at: now, status: body.status, by: c.user.name || c.user.username });
+      r.status = body.status;
+    }
+    if (body.notes !== undefined) r.notes = str(body.notes, 5000);
+    r.updatedAt = now;
+    await put(c.db, 'requests', r);
+    return json({ request: r });
   }));
-  router.delete('/api/admin/requests/:id', guard(async (req, res, { params }) => {
-    let found = false;
-    await update('requests', (list) => list.filter((r) => (r.id === params.id ? ((found = true), false) : true)));
-    if (!found) throw new HttpError(404, 'Demande introuvable.');
-    sendJSON(req, res, 200, { ok: true });
+  router.delete('/api/admin/requests/:id', guard(async (c) => {
+    if (!(await remove(c.db, 'requests', c.params.id))) throw new HttpError(404, 'Demande introuvable.');
+    return json({ ok: true });
   }));
 }
+

@@ -1,8 +1,4 @@
 // Règles métier : validation / nettoyage des modèles, styles, contenus, demandes et images.
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import crypto from 'node:crypto';
-import { config } from './config.js';
 import { HttpError } from './http.js';
 import {
   STYLE_IDS, ROOMS, MATERIALS, COLOR_FAMILIES, AVAILABILITY, HEADINGS, FINISHES, HEMS,
@@ -91,10 +87,12 @@ export function sanitizeModel(input, existing = {}) {
   if (input.images !== undefined) {
     const im = input.images || {};
     const mk = im.mockups || {};
+    const sm = im.mockupsSmall || {};
     m.images = {
       original: localImage(im.original),
       swatch: localImage(im.swatch),
       mockups: { ferme: localImage(mk.ferme), miOuvert: localImage(mk.miOuvert), embrasse: localImage(mk.embrasse) },
+      mockupsSmall: { ferme: localImage(sm.ferme), miOuvert: localImage(sm.miOuvert), embrasse: localImage(sm.embrasse) },
     };
   }
   if (input.analysis !== undefined) {
@@ -236,29 +234,6 @@ export function sanitizeComposition(input) {
       hardware: oneOf(o.hardware, ['brass', 'black', 'wood', 'white'], 'brass'),
     },
   };
-}
-
-// --- Images (téléversements) ---
-const SIGNATURES = [
-  { ext: 'webp', test: (b) => b.slice(0, 4).toString('ascii') === 'RIFF' && b.slice(8, 12).toString('ascii') === 'WEBP' },
-  { ext: 'jpg', test: (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff },
-  { ext: 'png', test: (b) => b.slice(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) },
-];
-
-/** Enregistre une image reçue en data URL après vérification de sa signature binaire. */
-export async function saveDataUrlImage(dataUrl, folder, maxBytes = config.limits.uploadBytes) {
-  const m = /^data:image\/(webp|jpeg|jpg|png);base64,([A-Za-z0-9+/=\s]+)$/.exec(String(dataUrl || ''));
-  if (!m) throw new HttpError(400, 'Image invalide (formats acceptés : WebP, JPEG, PNG).');
-  const buf = Buffer.from(m[2], 'base64');
-  if (!buf.length || buf.length > maxBytes) throw new HttpError(413, 'Image trop volumineuse.');
-  const sig = SIGNATURES.find((s) => s.test(buf));
-  if (!sig) throw new HttpError(400, 'Le fichier ne semble pas être une image valide.');
-  const sub = path.join(folder.replace(/[^a-z0-9-]/gi, ''), new Date().toISOString().slice(0, 7));
-  const dir = path.join(config.uploadDir, sub);
-  await fs.mkdir(dir, { recursive: true });
-  const name = `${crypto.randomBytes(10).toString('hex')}.${sig.ext}`;
-  await fs.writeFile(path.join(dir, name), buf);
-  return `/uploads/${sub.split(path.sep).join('/')}/${name}`;
 }
 
 export const REQUEST_STATUS_IDS = ids(REQUEST_STATUSES);

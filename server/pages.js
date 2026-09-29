@@ -1,12 +1,10 @@
 // Pages publiques rendues côté serveur (SEO) + plan du site, sitemap.xml, robots.txt.
-import { read } from './store.js';
+import { cachedAll } from './db.js';
 import { render, escapeHtml, safeJson, formatMoney } from './templates.js';
-import { send, siteUrl, HttpError } from './http.js';
+import { html, text, siteUrl, HttpError } from './http.js';
 import { publishedModels } from './api-public.js';
 import { publicModel } from './domain.js';
-import {
-  ROOMS, MATERIALS, COLOR_FAMILIES, AVAILABILITY, HEADINGS, labelOf,
-} from '../public/js/shared/taxonomy.js';
+import { ROOMS, MATERIALS, COLOR_FAMILIES, AVAILABILITY, HEADINGS, labelOf } from '../public/js/shared/taxonomy.js';
 
 const NAV = [
   { id: 'accueil', href: '/', label: 'Accueil' },
@@ -18,16 +16,17 @@ const NAV = [
 ];
 
 const SOCIAL_ICONS = { tiktok: 'TikTok', instagram: 'Instagram', facebook: 'Facebook', whatsapp: 'WhatsApp' };
+const WA_TEXT = 'Bonjour Fany, je vous contacte depuis votre site Cozy Home.';
+// Tailles d'affichage des cartes : le navigateur choisit la version légère (480 px) sur mobile.
+const CARD_SIZES = '(max-width: 600px) 80vw, (max-width: 1100px) 45vw, 25vw';
 
-export function waLink(number, text = '') {
+export function waLink(number, textMsg = '') {
   const digits = String(number || '').replace(/\D/g, '');
   if (!digits) return '';
-  return `https://wa.me/${digits}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
+  return `https://wa.me/${digits}${textMsg ? `?text=${encodeURIComponent(textMsg)}` : ''}`;
 }
 
-function place(site) {
-  return site.city ? `${site.city}` : site.country || '';
-}
+const place = (site) => (site.city ? `${site.city}` : site.country || '');
 
 /** « à Douala » si la ville est renseignée, sinon « au Cameroun ». */
 function lieu(site) {
@@ -37,19 +36,23 @@ function lieu(site) {
 
 const fillLieu = (site, s) => String(s || '').replace(/\{lieu\}/g, lieu(site)).replace(/\s{2,}/g, ' ').trim();
 
+/** Données partagées par les pages : contenus, salles et modèles publiés (lectures D1 mises en cache 10 s). */
+async function loadData(c) {
+  const [content, styles, models] = await Promise.all([cachedAll(c.db, 'content'), cachedAll(c.db, 'styles'), publishedModels(c.db)]);
+  return { content, styles, models, styleById: Object.fromEntries(styles.map((s) => [s.id, s])) };
+}
+
 /** Contexte commun à toutes les pages. */
-function baseContext(req, pageId, seoKey, overrides = {}) {
-  const content = read('content');
+function baseContext(c, data, pageId, seoKey, overrides = {}) {
+  const { content } = data;
   const site = content.site;
-  const base = siteUrl(req);
+  const base = siteUrl(c.req, c.env);
   const seo = { ...(content.seo?.[seoKey] || {}), ...(overrides.seo || {}) };
-  const where = place(site);
   const fill = (s) => fillLieu(site, s);
-  const url = new URL(req.url, base);
-  const canonical = `${base}${overrides.canonicalPath ?? url.pathname}`;
+  const canonical = `${base}${overrides.canonicalPath ?? c.url.pathname}`;
   const social = [
     { id: 'tiktok', label: 'TikTok', url: site.social.tiktok, handle: '@cozyhomebyfany' },
-    { id: 'whatsapp', label: 'WhatsApp', url: waLink(site.whatsapp, 'Bonjour Fany, je vous contacte depuis votre site Cozy Home.') },
+    { id: 'whatsapp', label: 'WhatsApp', url: waLink(site.whatsapp, WA_TEXT) },
     { id: 'instagram', label: 'Instagram', url: site.social.instagram },
     { id: 'facebook', label: 'Facebook', url: site.social.facebook },
   ].map((s) => ({ ...s, active: !!s.url, icon: s.id, name: SOCIAL_ICONS[s.id] }));
@@ -64,19 +67,18 @@ function baseContext(req, pageId, seoKey, overrides = {}) {
       robots: overrides.robots || 'index, follow',
       script: overrides.script || '',
       bodyClass: overrides.bodyClass || '',
-      jsonld: safeJson(overrides.jsonld || organizationLd(req, content)),
+      jsonld: safeJson(overrides.jsonld || organizationLd(base, content)),
     },
-    site: { ...site, place: where, lieu: lieu(site) },
+    site: { ...site, place: place(site), lieu: lieu(site) },
     content,
     nav: NAV.map((n) => ({ ...n, active: n.id === pageId })),
     social,
-    wa: { number: site.whatsapp, link: waLink(site.whatsapp, 'Bonjour Fany, je vous contacte depuis votre site Cozy Home.') },
+    wa: { number: site.whatsapp, link: waLink(site.whatsapp, WA_TEXT) },
     year: new Date().getFullYear(),
   };
 }
 
-function organizationLd(req, content) {
-  const base = siteUrl(req);
+function organizationLd(base, content) {
   const s = content.site;
   return {
     '@context': 'https://schema.org',
@@ -95,44 +97,57 @@ function organizationLd(req, content) {
   };
 }
 
-const STYLE_BY_ID = () => Object.fromEntries(read('styles').map((s) => [s.id, s]));
+/** Attribut srcset « petite / grande » d'un mock-up (vide si la version légère n'existe pas). */
+function srcset(m, key) {
+  const big = m.images?.mockups?.[key];
+  const small = m.images?.mockupsSmall?.[key];
+  return big && small ? `${small} 480w, ${big} 900w` : '';
+}
 
 /** Données d'une carte modèle pour les gabarits. */
-function card(m, styles = STYLE_BY_ID()) {
+function card(m, styleById) {
+  const coverKey = m.images?.mockups?.miOuvert ? 'miOuvert' : 'ferme';
   return {
     ...m,
-    styleName: styles[m.style]?.short || m.style,
+    styleName: styleById[m.style]?.short || m.style,
     materialLabel: labelOf(MATERIALS, m.material),
     availabilityLabel: labelOf(AVAILABILITY, m.availability),
     unavailable: m.availability === 'epuise',
     priceLabel: m.price ? `${formatMoney(m.price.amount)} ${m.price.unit === 'metre' ? 'le mètre' : m.price.unit === 'paire' ? 'la paire' : 'le panneau'}` : 'Prix sur devis',
-    cover: m.images?.mockups?.miOuvert || m.images?.mockups?.ferme || m.images?.swatch,
-    palette: (m.colors || []).map((c) => c.hex).join(','),
+    cover: m.images?.mockups?.[coverKey] || m.images?.swatch,
+    coverSrcset: srcset(m, coverKey),
+    fermeSrcset: srcset(m, 'ferme'),
+    altSrc: m.images?.mockupsSmall?.embrasse || m.images?.mockups?.embrasse || '',
+    sizes: CARD_SIZES,
+    palette: (m.colors || []).map((col) => col.hex).join(','),
     roomsLabel: (m.rooms || []).map((r) => labelOf(ROOMS, r)).join(' · '),
   };
 }
 
-function page(res, req, view, ctx) {
-  send(req, res, 200, render(view, ctx), 'text/html; charset=utf-8', { 'Cache-Control': 'no-cache' });
-}
+const page = (view, ctx, status = 200) => html(render(view, ctx), status);
 
-export function renderNotFound(req, res) {
-  const ctx = baseContext(req, '', 'notFound', { robots: 'noindex', seo: { title: 'Page introuvable | Cozy Home by Fany', description: '' } });
-  send(req, res, 404, render('404', ctx));
+export async function renderNotFound(c) {
+  try {
+    const data = await loadData(c);
+    const ctx = baseContext(c, data, '', 'notFound', { robots: 'noindex', seo: { title: 'Page introuvable | Cozy Home by Fany', description: '' } });
+    return page('404', ctx, 404);
+  } catch {
+    return html(render('erreur', { status: 404, message: 'Page introuvable.' }), 404);
+  }
 }
 
 export function registerPages(router) {
-  router.get('/', (req, res) => {
-    const models = publishedModels();
-    const featured = models.filter((m) => m.featured).slice(0, 6);
-    const ctx = baseContext(req, 'accueil', 'home', { script: '/js/pages/home.js', bodyClass: 'has-hero' });
+  router.get('/', async (c) => {
+    const data = await loadData(c);
+    const featured = data.models.filter((m) => m.featured).slice(0, 6);
+    const ctx = baseContext(c, data, 'accueil', 'home', { script: '/js/pages/home.js', bodyClass: 'has-hero' });
     const icons = ['hand', 'ruler', 'truck', 'chat'];
     const home = { ...ctx.content.home, reassurance: (ctx.content.home.reassurance || []).map((r, i) => ({ ...r, icon: icons[i % icons.length] })) };
-    page(res, req, 'index', {
+    return page('index', {
       ...ctx,
       home,
-      featured: (featured.length ? featured : models.slice(0, 6)).map((m) => card(m)),
-      styles: read('styles').sort((a, b) => a.order - b.order),
+      featured: (featured.length ? featured : data.models.slice(0, 6)).map((m) => card(m, data.styleById)),
+      styles: data.styles,
       tiktokVideos: (home.tiktokVideos || []).filter((v) => /tiktok\.com\/.*\/video\/(\d+)/.test(v.url)).map((v) => ({ ...v, id: /video\/(\d+)/.exec(v.url)[1] })),
       pageData: safeJson({
         featured: featured.map(publicModel),
@@ -141,33 +156,31 @@ export function registerPages(router) {
     });
   });
 
-  router.get('/galerie', (req, res) => {
-    const models = publishedModels();
-    const styles = read('styles').sort((a, b) => a.order - b.order).map((s, i) => {
-      const alt = i % 2 === 1;
-      const inStyle = models.filter((m) => m.style === s.id);
+  router.get('/galerie', async (c) => {
+    const data = await loadData(c);
+    const styles = data.styles.map((s, i) => {
+      const inStyle = data.models.filter((m) => m.style === s.id);
       const featured = inStyle.find((m) => m.slug === s.featuredModel) || inStyle[0] || null;
-      return { ...s, alt, count: inStyle.length, countLabel: `${inStyle.length} modèle${inStyle.length > 1 ? 's' : ''} au catalogue`, featured: featured ? publicModel(featured) : null };
+      return { ...s, alt: i % 2 === 1, count: inStyle.length, countLabel: `${inStyle.length} modèle${inStyle.length > 1 ? 's' : ''} au catalogue`, featured: featured ? publicModel(featured) : null };
     });
-    const ctx = baseContext(req, 'galerie', 'galerie', { script: '/js/pages/galerie.js', bodyClass: 'page-galerie' });
-    page(res, req, 'galerie', { ...ctx, galerie: ctx.content.galerie, styles, pageData: safeJson({ styles }) });
+    const ctx = baseContext(c, data, 'galerie', 'galerie', { script: '/js/pages/galerie.js', bodyClass: 'page-galerie' });
+    return page('galerie', { ...ctx, galerie: ctx.content.galerie, styles, pageData: safeJson({ styles }) });
   });
 
-  router.get('/catalogue', (req, res) => {
-    const styles = read('styles').sort((a, b) => a.order - b.order);
-    const byId = Object.fromEntries(styles.map((s) => [s.id, s]));
-    const models = publishedModels().map((m) => card(m, byId));
+  router.get('/catalogue', async (c) => {
+    const data = await loadData(c);
+    const models = data.models.map((m) => card(m, data.styleById));
     const used = (key) => new Set(models.flatMap((m) => [].concat(m[key] || [])));
     const usedMaterials = used('material');
     const usedRooms = used('rooms');
     const usedFamilies = used('colorFamilies');
-    const ctx = baseContext(req, 'catalogue', 'catalogue', { script: '/js/pages/catalogue.js' });
-    page(res, req, 'catalogue', {
+    const ctx = baseContext(c, data, 'catalogue', 'catalogue', { script: '/js/pages/catalogue.js' });
+    return page('catalogue', {
       ...ctx,
       catalogue: ctx.content.catalogue,
       models,
       filters: {
-        styles: styles.map((s) => ({ id: s.id, label: s.short })),
+        styles: data.styles.map((s) => ({ id: s.id, label: s.short })),
         families: COLOR_FAMILIES.filter((f) => usedFamilies.has(f.id)),
         materials: MATERIALS.filter((m) => usedMaterials.has(m.id)),
         rooms: ROOMS.filter((r) => usedRooms.has(r.id)),
@@ -176,12 +189,12 @@ export function registerPages(router) {
     });
   });
 
-  router.get('/catalogue/:slug', (req, res, { params }) => {
-    const m = publishedModels().find((x) => x.slug === params.slug);
+  router.get('/catalogue/:slug', async (c) => {
+    const data = await loadData(c);
+    const m = data.models.find((x) => x.slug === c.params.slug);
     if (!m) throw new HttpError(404, 'Modèle introuvable.');
-    const styles = STYLE_BY_ID();
-    const c = card(m, styles);
-    const base = siteUrl(req);
+    const styles = data.styleById;
+    const base = siteUrl(c.req, c.env);
     const images = [m.images.mockups.ferme, m.images.mockups.miOuvert, m.images.mockups.embrasse].filter(Boolean);
     const ld = {
       '@context': 'https://schema.org',
@@ -199,8 +212,8 @@ export function registerPages(router) {
         },
       } : {}),
     };
-    const related = publishedModels().filter((x) => x.id !== m.id && (x.style === m.style || x.colorFamilies.some((f) => m.colorFamilies.includes(f)))).slice(0, 4).map((x) => card(x, styles));
-    const ctx = baseContext(req, 'catalogue', 'modele', {
+    const related = data.models.filter((x) => x.id !== m.id && (x.style === m.style || x.colorFamilies.some((f) => m.colorFamilies.includes(f)))).slice(0, 4).map((x) => card(x, styles));
+    const ctx = baseContext(c, data, 'catalogue', 'modele', {
       script: '/js/pages/modele.js',
       ogImage: images[0],
       jsonld: ld,
@@ -209,15 +222,16 @@ export function registerPages(router) {
         description: `${m.description} Rideau ${labelOf(MATERIALS, m.material).toLowerCase()} confectionné sur mesure par l'atelier Cozy Home by Fany.`.slice(0, 300),
       },
     });
-    page(res, req, 'modele', {
+    const small = m.images.mockupsSmall || {};
+    return page('modele', {
       ...ctx,
-      model: c,
+      model: card(m, styles),
       style: styles[m.style],
       mockups: [
-        { key: 'ferme', label: 'Fermé', src: m.images.mockups.ferme },
-        { key: 'miOuvert', label: 'Mi-ouvert', src: m.images.mockups.miOuvert },
-        { key: 'embrasse', label: 'Avec embrasses', src: m.images.mockups.embrasse },
-        { key: 'echantillon', label: 'Échantillon', src: m.images.original || m.images.swatch },
+        { key: 'ferme', label: 'Fermé', src: m.images.mockups.ferme, thumb: small.ferme || m.images.mockups.ferme },
+        { key: 'miOuvert', label: 'Mi-ouvert', src: m.images.mockups.miOuvert, thumb: small.miOuvert || m.images.mockups.miOuvert },
+        { key: 'embrasse', label: 'Avec embrasses', src: m.images.mockups.embrasse, thumb: small.embrasse || m.images.mockups.embrasse },
+        { key: 'echantillon', label: 'Échantillon', src: m.images.original || m.images.swatch, thumb: m.images.swatch || m.images.original },
       ].filter((x) => x.src),
       colorsLabel: (m.colors || []).map((x) => x.name).filter(Boolean).join(', '),
       headingLabel: labelOf(HEADINGS, m.render?.heading),
@@ -226,78 +240,71 @@ export function registerPages(router) {
     });
   });
 
-  router.get('/composer', (req, res) => {
-    const ctx = baseContext(req, 'composer', 'composer', { script: '/js/pages/composer.js', bodyClass: 'page-composer' });
-    const models = publishedModels().map(publicModel);
-    page(res, req, 'composer', { ...ctx, composer: ctx.content.composer, pageData: safeJson({ models, styles: read('styles') }) });
+  router.get('/composer', async (c) => {
+    const data = await loadData(c);
+    const ctx = baseContext(c, data, 'composer', 'composer', { script: '/js/pages/composer.js', bodyClass: 'page-composer' });
+    return page('composer', { ...ctx, composer: ctx.content.composer, pageData: safeJson({ models: data.models.map(publicModel), styles: data.styles }) });
   });
 
-  router.get('/contact', (req, res) => {
-    const ctx = baseContext(req, 'contact', 'contact', { script: '/js/pages/contact.js' });
-    const models = publishedModels().map((m) => ({ slug: m.slug, name: m.name }));
-    page(res, req, 'contact', {
-      ...ctx,
-      contact: ctx.content.contact,
-      rooms: ROOMS,
-      models,
-      pageData: safeJson({ models }),
-    });
+  router.get('/contact', async (c) => {
+    const data = await loadData(c);
+    const ctx = baseContext(c, data, 'contact', 'contact', { script: '/js/pages/contact.js' });
+    const models = data.models.map((m) => ({ slug: m.slug, name: m.name }));
+    return page('contact', { ...ctx, contact: ctx.content.contact, rooms: ROOMS, models, pageData: safeJson({ models }) });
   });
 
-  router.get('/commande/:slug', (req, res, { params }) => {
-    const m = publishedModels().find((x) => x.slug === params.slug);
+  router.get('/commande/:slug', async (c) => {
+    const data = await loadData(c);
+    const m = data.models.find((x) => x.slug === c.params.slug);
     if (!m) throw new HttpError(404, 'Modèle introuvable.');
-    const ctx = baseContext(req, 'catalogue', 'commande', {
+    const ctx = baseContext(c, data, 'catalogue', 'commande', {
       script: '/js/pages/commande.js',
       robots: 'noindex, follow',
       seo: { title: `Commander « ${m.name} » | Cozy Home by Fany`, description: `Commande du modèle ${m.name}, confectionné sur mesure.` },
     });
-    page(res, req, 'commande', {
-      ...ctx,
-      contact: ctx.content.contact,
-      model: card(m),
-      headings: HEADINGS,
-      pageData: safeJson({ model: publicModel(m) }),
-    });
+    return page('commande', { ...ctx, contact: ctx.content.contact, model: card(m, data.styleById), headings: HEADINGS, pageData: safeJson({ model: publicModel(m) }) });
   });
 
-  router.get('/atelier', (req, res) => {
-    const ctx = baseContext(req, 'atelier', 'atelier', { script: '/js/pages/atelier.js' });
-    page(res, req, 'atelier', { ...ctx, atelier: ctx.content.atelier });
+  router.get('/atelier', async (c) => {
+    const data = await loadData(c);
+    const ctx = baseContext(c, data, 'atelier', 'atelier', { script: '/js/pages/atelier.js' });
+    return page('atelier', { ...ctx, atelier: ctx.content.atelier });
   });
 
-  router.get('/confidentialite', (req, res) => {
-    const ctx = baseContext(req, '', 'confidentialite', { robots: 'noindex, follow' });
-    page(res, req, 'confidentialite', { ...ctx, legal: ctx.content.legal });
+  router.get('/confidentialite', async (c) => {
+    const data = await loadData(c);
+    const ctx = baseContext(c, data, '', 'confidentialite', { robots: 'noindex, follow' });
+    return page('confidentialite', { ...ctx, legal: ctx.content.legal });
   });
 
-  router.get('/plan-du-site', (req, res) => {
-    const ctx = baseContext(req, '', 'planDuSite');
-    const styles = read('styles').sort((a, b) => a.order - b.order);
-    page(res, req, 'plan-du-site', { ...ctx, styles, models: publishedModels().map((m) => card(m)) });
+  router.get('/plan-du-site', async (c) => {
+    const data = await loadData(c);
+    const ctx = baseContext(c, data, '', 'planDuSite');
+    return page('plan-du-site', { ...ctx, styles: data.styles, models: data.models.map((m) => card(m, data.styleById)) });
   });
 
-  router.get('/robots.txt', (req, res) => {
-    const base = siteUrl(req);
-    send(req, res, 200, `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /commande/\n\nSitemap: ${base}/sitemap.xml\n`, 'text/plain; charset=utf-8');
+  router.get('/robots.txt', (c) => {
+    const base = siteUrl(c.req, c.env);
+    return text(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /commande/\n\nSitemap: ${base}/sitemap.xml\n`);
   });
 
-  router.get('/sitemap.xml', (req, res) => {
-    const base = siteUrl(req);
-    const pages = ['/', '/galerie', '/catalogue', '/composer', '/atelier', '/contact', '/plan-du-site'];
-    const models = publishedModels();
+  router.get('/sitemap.xml', async (c) => {
+    const base = siteUrl(c.req, c.env);
+    const staticPages = ['/', '/galerie', '/catalogue', '/composer', '/atelier', '/contact', '/plan-du-site'];
+    const models = await publishedModels(c.db);
     const urls = [
-      ...pages.map((p) => ({ loc: base + p, priority: p === '/' ? '1.0' : '0.8' })),
+      ...staticPages.map((p) => ({ loc: base + p, priority: p === '/' ? '1.0' : '0.8' })),
       ...models.map((m) => ({ loc: `${base}/catalogue/${m.slug}`, lastmod: m.updatedAt?.slice(0, 10), priority: '0.7' })),
     ];
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
       .map((u) => `  <url><loc>${escapeHtml(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}<priority>${u.priority}</priority></url>`)
       .join('\n')}\n</urlset>\n`;
-    send(req, res, 200, xml, 'application/xml; charset=utf-8');
+    return text(xml, 'application/xml; charset=utf-8');
   });
 
-  router.get('/admin', (req, res) => {
-    const ctx = baseContext(req, '', 'admin', { robots: 'noindex, nofollow', seo: { title: 'Espace pro | Cozy Home by Fany', description: '' } });
-    page(res, req, 'admin/app', ctx);
+  router.get('/admin', async (c) => {
+    const data = await loadData(c);
+    const ctx = baseContext(c, data, '', 'admin', { robots: 'noindex, nofollow', seo: { title: 'Espace pro | Cozy Home by Fany', description: '' } });
+    return page('admin/app', ctx);
   });
 }

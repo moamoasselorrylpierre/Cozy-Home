@@ -1,7 +1,7 @@
 // Contenus du site : textes, images et liens modifiables sans toucher au code.
 import { api, upload } from '../api.js';
 import { html, raw, $, $$, toast, setBusy } from '../ui.js';
-import { compress, readImageFile } from '../../modules/fabric-analysis.js';
+import { encodeImage, readImageFile, formatBytes } from '../../modules/fabric-analysis.js';
 
 const T = 'textarea';
 const LIEU = 'Astuce : {lieu} est remplacé automatiquement par « à [votre ville] » (ou « au Cameroun »).';
@@ -168,13 +168,16 @@ export async function render(el) {
     const box = input.closest('[data-image]');
     try {
       box.classList.add('is-busy');
-      const img = await readImageFile(input.files[0]);
-      const url = await upload(compress(img, { maxSide: 2000, quality: 0.84 }), 'contenus');
+      const file = input.files[0];
+      const img = await readImageFile(file);
+      // Compression avant envoi (portrait plus petit, autres images jusqu'à 1800 px).
+      const encoded = await encodeImage(img, /portrait/i.test(box.dataset.image) ? 'portrait' : 'content');
+      const url = await upload(encoded.blob, 'contenus');
       content = collect();
       set(content, box.dataset.image, url);
       dirty();
       draw(openSection());
-      toast('Image téléversée — pensez à enregistrer.');
+      toast(`Image optimisée : ${formatBytes(file.size)} → ${formatBytes(encoded.blob.size)}. Pensez à enregistrer.`, 5000);
     } catch (err) {
       toast(err.message);
       box.classList.remove('is-busy');
