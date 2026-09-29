@@ -1,0 +1,4 @@
+Polices auto-hébergées :
+- Cormorant Garamond — Christian Thalmann (Catharsis Fonts) — SIL Open Font License 1.1
+- Jost — Owen Earl (indestructible type*) — SIL Open Font License 1.1
+Texte de la licence : https://openfontlicense.org/open-font-license-official-text/

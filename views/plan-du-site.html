@@ -1,0 +1,32 @@
+{{> head }}
+{{> header }}
+<section class="page-head container--narrow" style="padding-bottom:var(--section)">
+  <p class="kicker">Navigation</p>
+  <h1>Plan du site</h1>
+  <div class="sitemap-tree">
+    <ul>
+      <li><a href="/">Accueil</a>
+        <ul>
+          <li><a href="/#motifs">Motifs à la une</a></li>
+        </ul>
+      </li>
+      <li><a href="/galerie">La Galerie — exposition des styles</a>
+        <ul>{{#each styles as s}}<li><a href="/galerie#salle-{{ s.id }}">Salle {{ s.roman }} · {{ s.name }}</a></li>{{/each}}</ul>
+      </li>
+      <li><a href="/catalogue">Catalogue</a>
+        <ul>{{#each models as m}}<li><a href="/catalogue/{{ m.slug }}">{{ m.name }}</a> <small>({{ m.styleName }})</small></li>{{/each}}</ul>
+      </li>
+      <li><a href="/composer">Compose ton intérieur</a></li>
+      <li><a href="/contact">Contact &amp; devis</a>
+        <ul>
+          <li><a href="/contact?demande=devis">Demande de devis</a></li>
+          <li><a href="/contact?demande=conseil">Demande de conseil</a></li>
+          <li><a href="/contact?demande=commande">Commander un modèle</a></li>
+        </ul>
+      </li>
+      <li><a href="/atelier">L’Atelier — à propos de Fany</a></li>
+      <li><a href="/confidentialite">Confidentialité</a></li>
+    </ul>
+  </div>
+</section>
+{{> footer }}

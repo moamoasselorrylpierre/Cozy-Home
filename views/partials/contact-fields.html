@@ -1,0 +1,18 @@
+<div class="form__row">
+  <label class="field"><span>Nom et prénom *</span><input class="input" type="text" name="name" required maxlength="100" autocomplete="name"></label>
+  <label class="field"><span>Ville / quartier</span><input class="input" type="text" name="city" maxlength="80" autocomplete="address-level2"></label>
+</div>
+<div class="form__row">
+  <label class="field"><span>WhatsApp / téléphone</span><input class="input" type="tel" name="phone" maxlength="30" autocomplete="tel" placeholder="+237 …"></label>
+  <label class="field"><span>E-mail</span><input class="input" type="email" name="email" maxlength="120" autocomplete="email"></label>
+</div>
+<fieldset class="field">
+  <legend>Comment préférez-vous être recontacté·e ?</legend>
+  <div class="choice-grid">
+    <label class="choice"><input type="radio" name="contactPref" value="whatsapp" checked><span>WhatsApp</span></label>
+    <label class="choice"><input type="radio" name="contactPref" value="appel"><span>Appel</span></label>
+    <label class="choice"><input type="radio" name="contactPref" value="email"><span>E-mail</span></label>
+  </div>
+</fieldset>
+<label class="hp-field" aria-hidden="true">Site web<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+<p class="form__note">* Indiquez au moins un moyen de vous joindre (WhatsApp, téléphone ou e-mail). Vos informations servent uniquement à répondre à votre demande — <a href="/confidentialite">confidentialité</a>.</p>

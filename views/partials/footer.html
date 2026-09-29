@@ -1,0 +1,46 @@
+</main>
+<footer class="site-footer">
+  <div class="container site-footer__grid">
+    <div class="site-footer__brand">
+      <a class="brand brand--light" href="/" aria-label="Cozy Home by Fany — accueil">
+        <img class="brand__mark" src="/img/logo.svg" alt="" width="28" height="36" loading="lazy">
+        <span class="brand__word">Cozy Home<em>by Fany</em></span>
+      </a>
+      <p class="site-footer__tagline">{{ site.tagline }}</p>
+      <p class="site-footer__quote">« Plus qu’un rideau, une ambiance. »</p>
+    </div>
+    <nav class="site-footer__nav" aria-label="Pied de page">
+      <p class="kicker kicker--light">Le site</p>
+      <ul>
+        {{#each nav as item}}<li><a href="{{ item.href }}">{{ item.label }}</a></li>{{/each}}
+        <li><a href="/plan-du-site">Plan du site</a></li>
+      </ul>
+    </nav>
+    <div class="site-footer__contact">
+      <p class="kicker kicker--light">Contact</p>
+      <ul>
+        <li><a href="{{ wa.link }}" target="_blank" rel="noopener">WhatsApp · {{ wa.number }}</a></li>
+        {{#if site.email}}<li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>{{/if}}
+        {{#if site.address}}<li>{{ site.address }}</li>{{/if}}
+        <li>{{ site.hours }}</li>
+        {{#if site.city}}<li>{{ site.city }}, {{ site.country }}</li>{{else}}<li>{{ site.country }}</li>{{/if}}
+      </ul>
+    </div>
+    <div class="site-footer__social">
+      <p class="kicker kicker--light">Suivre l’atelier</p>
+      <ul class="social">
+        {{#each social as s}}
+        <li>{{#if s.active}}<a class="social__link" href="{{ s.url }}" target="_blank" rel="noopener" aria-label="{{ s.name }}"><svg aria-hidden="true"><use href="#i-{{ s.icon }}"></use></svg><span>{{ s.name }}</span></a>{{else}}<span class="social__link is-soon" title="Bientôt disponible"><svg aria-hidden="true"><use href="#i-{{ s.icon }}"></use></svg><span>{{ s.name }} <small>bientôt</small></span></span>{{/if}}</li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© {{ year }} Cozy Home by Fany · Confection artisanale de rideaux sur mesure</p>
+    <p><a href="/confidentialite">Confidentialité</a> · <a class="pro-link" href="/admin"><svg aria-hidden="true"><use href="#i-key"></use></svg>Espace pro</a></p>
+  </div>
+</footer>
+<a class="wa-float" href="{{ wa.link }}" target="_blank" rel="noopener" aria-label="Discuter avec Fany sur WhatsApp" data-wa-float><svg aria-hidden="true"><use href="#i-whatsapp"></use></svg><span>Une question ?</span></a>
+<div class="toast" role="status" aria-live="polite" data-toast></div>
+</body>
+</html>

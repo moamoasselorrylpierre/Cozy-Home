@@ -1,0 +1,26 @@
+<body class="{{ page.bodyClass }}" data-page="{{ page.id }}">
+{{> icons }}
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<header class="site-header" data-header>
+  <div class="site-header__inner container">
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" data-nav-toggle>
+      <svg aria-hidden="true"><use href="#i-menu"></use></svg><span class="visually-hidden">Ouvrir le menu</span>
+    </button>
+    <a class="brand" href="/" aria-label="Cozy Home by Fany — accueil">
+      <img class="brand__mark" src="/img/logo.svg" alt="" width="28" height="36">
+      <span class="brand__word">Cozy Home<em>by Fany</em></span>
+    </a>
+    <nav class="main-nav" id="menu-principal" aria-label="Navigation principale" data-nav>
+      <ul>
+        {{#each nav as item}}<li><a href="{{ item.href }}"{{#if item.active}} aria-current="page"{{/if}}>{{ item.label }}</a></li>{{/each}}
+      </ul>
+      <div class="main-nav__extra">
+        <a class="btn btn--small" href="/contact?demande=devis">Demander un devis</a>
+        <p class="main-nav__contact">WhatsApp · <a href="{{ wa.link }}" rel="noopener" target="_blank">{{ wa.number }}</a></p>
+      </div>
+    </nav>
+    <a class="btn btn--small site-header__cta" href="/contact?demande=devis">Devis</a>
+    <a class="site-header__wa" href="{{ wa.link }}" rel="noopener" target="_blank" aria-label="Écrire sur WhatsApp"><svg aria-hidden="true"><use href="#i-whatsapp"></use></svg></a>
+  </div>
+</header>
+<main id="contenu">

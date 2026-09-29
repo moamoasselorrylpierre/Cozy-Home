@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banc d'essai tissus</title>
+<style>
+  :root { --bg: #1d1a17; --fg: #efe8dc; --muted: #a39a8c; --card: #28241f; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; }
+  h1 { font-weight: 500; font-size: 20px; margin: 0 0 4px; }
+  .hint { color: var(--muted); margin: 0 0 20px; font-size: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(var(--cols, 2), max-content); gap: 22px; }
+  figure { margin: 0; background: var(--card); padding: 10px; border-radius: 6px; }
+  canvas { display: block; }
+  canvas.px { image-rendering: pixelated; }
+  figcaption { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-top: 8px; }
+  .id { font-weight: 600; letter-spacing: .02em; }
+  .meta { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .bad { color: #ff8a70; }
+  .sw { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); }
+  .sw i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; border: 1px solid #0006; }
+  .err { color: #ff8a70; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>Tissus de démonstration — banc d'essai</h1>
+<p class="hint">Tuile répétée pour vérifier le raccord. Paramètres : ?size=256&amp;rep=3&amp;cols=2&amp;zoom=1&amp;only=id1,id2&amp;metrics=0&amp;bench=3</p>
+<div class="grid" id="grid"></div>
+<script type="module">
+import { FABRICS } from '../seed/fabric-patterns.js';
+
+const q = new URLSearchParams(location.search);
+const size = Number(q.get('size')) || 256;
+const rep = Number(q.get('rep')) || 3;
+const zoom = Number(q.get('zoom')) || 1;
+const cols = Number(q.get('cols')) || 2;
+const metrics = q.get('metrics') !== '0';
+const bench = Number(q.get('bench')) || 1;
+const only = q.get('only') ? q.get('only').split(',') : null;
+const grid = document.getElementById('grid');
+grid.style.setProperty('--cols', cols);
+
+const hex2 = (v) => v.toString(16).padStart(2, '0');
+const toHex = (c) => '#' + c.map((v) => hex2(Math.max(0, Math.min(255, Math.round(v))))).join('');
+
+// Couleurs dominantes : k-means déterministe (k=3) sur un sous-échantillon.
+function dominant(data, k = 3) {
+  const px = [];
+  for (let i = 0; i < data.length; i += 4 * 37) px.push([data[i], data[i + 1], data[i + 2]]);
+  const lum = (c) => 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2];
+  const sorted = [...px].sort((a, b) => lum(a) - lum(b));
+  let cent = Array.from({ length: k }, (_, j) => sorted[Math.floor(((j + 0.5) / k) * sorted.length)].slice());
+  let lab = new Int32Array(px.length);
+  for (let it = 0; it < 12; it++) {
+    const sum = cent.map(() => [0, 0, 0, 0]);
+    px.forEach((c, n) => {
+      let best = 0, bd = Infinity;
+      cent.forEach((m, j) => {
+        const d = (c[0] - m[0]) ** 2 + (c[1] - m[1]) ** 2 + (c[2] - m[2]) ** 2;
+        if (d < bd) { bd = d; best = j; }
+      });
+      lab[n] = best;
+      sum[best][0] += c[0]; sum[best][1] += c[1]; sum[best][2] += c[2]; sum[best][3]++;
+    });
+    cent = sum.map((s, j) => (s[3] ? [s[0] / s[3], s[1] / s[3], s[2] / s[3]] : cent[j]));
+  }
+  const counts = cent.map(() => 0);
+  lab.forEach((l) => counts[l]++);
+  return cent.map((c, j) => ({ hex: toHex(c), share: counts[j] / px.length })).sort((a, b) => b.share - a.share);
+}
+
+// Raccord : écart moyen entre colonnes/lignes opposées vs écart moyen entre voisines intérieures.
+function seam(data, S) {
+  const L = (x, y) => { const i = (y * S + x) * 4; return 0.3 * data[i] + 0.59 * data[i + 1] + 0.11 * data[i + 2]; };
+  let bx = 0, by = 0, ix = 0, iy = 0;
+  for (let t = 0; t < S; t++) {
+    bx += Math.abs(L(S - 1, t) - L(0, t));
+    by += Math.abs(L(t, S - 1) - L(t, 0));
+    for (let u = 0; u < S - 1; u++) {
+      ix += Math.abs(L(u, t) - L(u + 1, t));
+      iy += Math.abs(L(t, u) - L(t, u + 1));
+    }
+  }
+  return [bx / (ix / (S - 1)), by / (iy / (S - 1))];
+}
+
+const report = [];
+for (const f of FABRICS) {
+  if (only && !only.includes(f.id)) continue;
+  const fig = document.createElement('figure');
+  const cap = document.createElement('figcaption');
+  const tile = document.createElement('canvas');
+  tile.width = tile.height = size;
+  const tctx = tile.getContext('2d', { willReadFrequently: true });
+  let err = null, dt = 0;
+  try {
+    const t0 = performance.now();
+    f.draw(tctx, size);
+    dt = performance.now() - t0;
+  } catch (e) {
+    err = e;
+    console.error(f.id, e);
+  }
+  const big = document.createElement('canvas');
+  big.width = big.height = size * rep;
+  const bctx = big.getContext('2d');
+  for (let y = 0; y < rep; y++) for (let x = 0; x < rep; x++) bctx.drawImage(tile, x * size, y * size);
+  big.style.width = big.style.height = size * rep * zoom + 'px';
+  if (zoom > 1) big.className = 'px';
+  fig.appendChild(big);
+
+  const entry = { id: f.id, ms: Math.round(dt) };
+  let html = `<span class="id">${f.id}</span><span class="meta">${size}px : ${dt.toFixed(0)} ms</span>`;
+  if (metrics && !err) {
+    const c5 = document.createElement('canvas');
+    c5.width = c5.height = 512;
+    const x5 = c5.getContext('2d', { willReadFrequently: true });
+    let d5 = Infinity, first = 0;
+    for (let b = 0; b < bench; b++) {
+      const t0 = performance.now();
+      f.draw(x5, 512);
+      const dt5 = performance.now() - t0;
+      if (b === 0) first = dt5;
+      d5 = Math.min(d5, dt5);
+    }
+    entry.first512 = Math.round(first);
+    const data = x5.getImageData(0, 0, 512, 512).data;
+    const [sx, sy] = seam(data, 512);
+    const dom = dominant(data);
+    Object.assign(entry, { ms512: Math.round(d5), seamX: +sx.toFixed(2), seamY: +sy.toFixed(2), colors: dom });
+    const cls = d5 > 300 ? 'meta bad' : 'meta';
+    const scls = sx > 1.6 || sy > 1.6 ? 'meta bad' : 'meta';
+    html += `<span class="${cls}">512px : ${d5.toFixed(0)} ms</span>`;
+    html += `<span class="${scls}">raccord x ${sx.toFixed(2)} · y ${sy.toFixed(2)}</span>`;
+    html += dom.map((d) => `<span class="sw"><i style="background:${d.hex}"></i>${d.hex} ${(d.share * 100).toFixed(0)}%</span>`).join('');
+  }
+  if (err) html += `<div class="err">${String(err && err.stack || err)}</div>`;
+  cap.innerHTML = html;
+  fig.appendChild(cap);
+  grid.appendChild(fig);
+  report.push(entry);
+  await new Promise((r) => setTimeout(r, 0));
+}
+window.__fabricReport = report;
+document.body.dataset.ready = '1';
+console.log('FABRIC_REPORT ' + JSON.stringify(report));
+</script>
+</body>
+</html>

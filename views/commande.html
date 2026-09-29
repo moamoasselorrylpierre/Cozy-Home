@@ -1,0 +1,97 @@
+{{> head }}
+{{> header }}
+<header class="page-head container" style="padding-bottom:24px">
+  <nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a><span aria-hidden="true">/</span><a href="/catalogue">Catalogue</a><span aria-hidden="true">/</span><a href="/catalogue/{{ model.slug }}">{{ model.name }}</a><span aria-hidden="true">/</span>Commande</nav>
+  <p class="kicker">Commande sur mesure</p>
+  <h1 style="font-size:clamp(2.3rem,4.8vw,4rem)">Commander « {{ model.name }} »</h1>
+  <p class="lead">{{ contact.orderIntro }}</p>
+</header>
+<section class="container order-layout" style="padding-bottom:var(--section)" data-order>
+  <div>
+    <ol class="steps" data-steps>
+      <li class="is-active">Dimensions</li>
+      <li>Confection</li>
+      <li>Coordonnées</li>
+      <li>Récapitulatif</li>
+    </ol>
+    <form class="form" novalidate data-order-form>
+      <div class="order-step" data-step="0">
+        <div class="form__row">
+          <label class="field"><span>Largeur de la fenêtre (cm) *</span><input class="input" type="number" name="windowWidth" min="30" max="1200" required inputmode="numeric" placeholder="ex. 160"><small>Mesurez la largeur de l’ouverture ; nous ajoutons le débord de tringle.</small></label>
+          <label class="field"><span>Hauteur de pose (cm) *</span><input class="input" type="number" name="windowHeight" min="30" max="800" required inputmode="numeric" placeholder="ex. 260"><small>De la tringle (ou du plafond) jusqu’au sol ou à l’appui.</small></label>
+        </div>
+        <div class="form__row">
+          <label class="field"><span>Nombre de fenêtres</span><input class="input" type="number" name="windows" min="1" max="50" value="1" inputmode="numeric"></label>
+          <fieldset class="field"><legend>Panneaux par fenêtre</legend>
+            <div class="choice-grid">
+              <label class="choice"><input type="radio" name="panels" value="2" checked><span>Une paire</span></label>
+              <label class="choice"><input type="radio" name="panels" value="1"><span>Un panneau</span></label>
+            </div>
+          </fieldset>
+        </div>
+        <label class="field"><span>Pièce</span>
+          <select class="select" name="room"><option value="">— Choisir —</option><option value="salon">Salon</option><option value="chambre">Chambre</option><option value="salle-a-manger">Salle à manger</option><option value="cuisine">Cuisine</option><option value="salle-de-bain">Salle de bain</option><option value="bureau">Bureau</option><option value="chambre-enfant">Chambre d’enfant</option></select>
+        </label>
+      </div>
+
+      <div class="order-step" data-step="1" hidden>
+        <fieldset class="field"><legend>Type de pose</legend>
+          <div class="choice-grid">
+            {{#each headings as h}}<label class="choice"><input type="radio" name="heading" value="{{ h.id }}"{{#if @first}} checked{{/if}}><span>{{ h.label }}</span></label>{{/each}}
+          </div>
+        </fieldset>
+        <fieldset class="field"><legend>Doublure</legend>
+          <div class="choice-grid">
+            <label class="choice"><input type="radio" name="lining" value="sans" checked><span>Sans doublure</span></label>
+            <label class="choice"><input type="radio" name="lining" value="doublure"><span>Doublure classique</span></label>
+            <label class="choice"><input type="radio" name="lining" value="occultante"><span>Doublure occultante</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="field"><legend>Livraison</legend>
+          <div class="choice-grid">
+            <label class="choice"><input type="radio" name="installation" value="pose" checked><span>Livraison + pose</span></label>
+            <label class="choice"><input type="radio" name="installation" value="livraison"><span>Livraison seule</span></label>
+            <label class="choice"><input type="radio" name="installation" value="retrait"><span>Retrait à l’atelier</span></label>
+          </div>
+        </fieldset>
+        <label class="field"><span>Précisions (facultatif)</span><textarea class="textarea" name="message" maxlength="3000" placeholder="Embrasses, couleur de tringle, contraintes…"></textarea></label>
+      </div>
+
+      <div class="order-step" data-step="2" hidden>
+        {{> contact-fields }}
+        <label class="field"><span>Adresse de livraison / pose</span><input class="input" type="text" name="address" maxlength="300" autocomplete="street-address"></label>
+      </div>
+
+      <div class="order-step" data-step="3" hidden>
+        <div class="contact-card" data-recap></div>
+        <p class="form__note">Aucun paiement en ligne : Fany vous recontacte pour confirmer les mesures, le délai de confection et le règlement avant de lancer la confection.</p>
+      </div>
+
+      <p class="form__error" data-error role="alert"></p>
+      <div class="btn-row">
+        <button class="btn btn--ghost" type="button" data-prev hidden>Retour</button>
+        <button class="btn" type="button" data-next>Continuer</button>
+        <button class="btn" type="submit" data-submit hidden>Confirmer ma commande</button>
+      </div>
+    </form>
+    <div class="form-success" data-success hidden tabindex="-1">
+      <svg aria-hidden="true"><use href="#i-check"></use></svg>
+      <h2 style="font-size:2rem">Commande transmise</h2>
+      <p>{{ contact.thanks }}</p>
+      <p class="form__note">Référence : <strong data-reference></strong></p>
+      <div class="btn-row" style="justify-content:center"><a class="btn btn--wa" href="{{ wa.link }}" target="_blank" rel="noopener" data-success-wa><svg aria-hidden="true"><use href="#i-whatsapp"></use></svg>Prévenir Fany sur WhatsApp</a></div>
+    </div>
+  </div>
+  <aside class="order-summary">
+    <img src="{{ model.cover }}" alt="Rideau {{ model.name }}" width="900" height="1125">
+    <p class="kicker">{{ model.styleName }}</p>
+    <h2 style="font-size:1.9rem">{{ model.name }}</h2>
+    <dl data-summary>
+      <dt>Tarif</dt><dd>{{ model.priceLabel }}</dd>
+    </dl>
+    <div class="order-summary__total"><span>Estimation</span><span data-estimate>—</span></div>
+    <p class="form__note" style="margin-top:10px">Estimation indicative calculée à partir du tarif du modèle ; le prix définitif est confirmé par Fany après vérification des mesures et des options.</p>
+  </aside>
+</section>
+<script type="application/json" id="page-data">{{{ pageData }}}</script>
+{{> footer }}

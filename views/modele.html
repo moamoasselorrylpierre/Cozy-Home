@@ -1,0 +1,71 @@
+{{> head }}
+{{> header }}
+<article class="container" style="padding-block:clamp(28px,4vw,56px) var(--section)">
+  <nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a><span aria-hidden="true">/</span><a href="/catalogue">Catalogue</a><span aria-hidden="true">/</span><a href="/catalogue?style={{ model.style }}">{{ model.styleName }}</a><span aria-hidden="true">/</span>{{ model.name }}</nav>
+  <div class="product">
+    <div class="product__gallery" data-gallery>
+      <div class="product__thumbs" role="group" aria-label="Vues du modèle">
+        {{#each mockups as v}}<button type="button" data-view="{{ v.src }}" data-label="{{ v.label }}" aria-pressed="{{#if @first}}true{{else}}false{{/if}}"><img src="{{ v.src }}" alt="{{ v.label }}" loading="lazy" width="180" height="225"></button>{{/each}}
+      </div>
+      <div class="product__stage">
+        {{#each mockups as v}}{{#if @first}}<img src="{{ v.src }}" alt="Rideau {{ model.name }} — {{ v.label }}" data-stage width="900" height="1125" fetchpriority="high">{{/if}}{{/each}}
+        <span class="product__stage-label" data-stage-label>{{#each mockups as v}}{{#if @first}}{{ v.label }}{{/if}}{{/each}}</span>
+      </div>
+    </div>
+    <div class="product__info">
+      <p class="kicker">{{ style.roman }} · {{ model.styleName }}</p>
+      <h1>{{ model.name }}</h1>
+      <p class="product__price">{{ model.priceLabel }}</p>
+      <p class="lead">{{ model.description }}</p>
+      <dl class="product__facts">
+        <dt>Matière</dt><dd>{{ model.materialLabel }}</dd>
+        <dt>Couleurs</dt><dd><span class="swatches" style="margin-right:8px">{{#each model.colors as c}}<i style="background:{{ c.hex }}"></i>{{/each}}</span>{{ colorsLabel }}</dd>
+        <dt>Pose</dt><dd>{{ headingLabel }}</dd>
+        <dt>Pièces</dt><dd>{{ model.roomsLabel }}</dd>
+        <dt>Disponibilité</dt><dd><span class="availability availability--{{ model.availability }}">{{ model.availabilityLabel }}</span></dd>
+      </dl>
+      <p class="form__note">Confection sur mesure à l’atelier : dimensions, type de pose, doublure et finitions ajustés à votre fenêtre.</p>
+      <div class="product__actions">
+        {{#if model.unavailable}}<a class="btn" href="/contact?demande=devis&amp;modele={{ model.slug }}">Être prévenu·e / demander un devis</a>{{else}}<a class="btn" href="/commande/{{ model.slug }}">Commander ce modèle</a>{{/if}}
+        <a class="btn btn--ghost" href="/composer?rideau={{ model.slug }}">Essayer dans « Compose ton intérieur »</a>
+        <a class="link-arrow" style="justify-self:start;margin-top:8px" href="/contact?demande=devis&amp;modele={{ model.slug }}">Demander un devis personnalisé <svg aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+      </div>
+    </div>
+  </div>
+</article>
+
+<section class="section section--wash">
+  <div class="container">
+    <div class="section__head" data-reveal>
+      <p class="kicker">Mise en situation</p>
+      <h2>« {{ model.name }} » <em>autour du monde</em></h2>
+      <p class="lead">Projetez-vous : le même rideau, posé dans des intérieurs de styles différents.</p>
+    </div>
+    <div class="situ" data-situ>
+      <div class="situ__tabs" role="tablist" aria-label="Styles de décoration" data-situ-tabs></div>
+      <div class="situ__stage frame" style="padding:0">
+        <canvas data-situ-canvas role="img" aria-label="Rideau {{ model.name }} mis en situation"></canvas>
+        <div class="loading-veil" data-situ-veil>Mise en scène…</div>
+      </div>
+      <div class="situ__caption"><span data-situ-caption></span><a class="link-arrow" href="/composer?rideau={{ model.slug }}">Composer cette pièce <svg aria-hidden="true"><use href="#i-arrow"></use></svg></a></div>
+    </div>
+  </div>
+</section>
+
+{{#if related}}
+<section class="section">
+  <div class="container">
+    <div class="section__head" data-reveal><p class="kicker">Dans le même esprit</p><h2>Vous aimerez aussi</h2></div>
+    <div class="model-grid">
+      {{#each related as m}}
+      <a class="model-card" href="/catalogue/{{ m.slug }}" data-palette="{{ m.palette }}" data-reveal>
+        <div class="model-card__media"><img src="{{ m.cover }}" alt="Rideau {{ m.name }}" loading="lazy" decoding="async" width="900" height="1125"></div>
+        <div class="model-card__body"><span class="model-card__style">{{ m.styleName }}</span><h3 class="model-card__name">{{ m.name }}</h3><span class="model-card__line"></span></div>
+      </a>
+      {{/each}}
+    </div>
+  </div>
+</section>
+{{/if}}
+<script type="application/json" id="page-data">{{{ pageData }}}</script>
+{{> footer }}

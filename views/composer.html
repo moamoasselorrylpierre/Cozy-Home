@@ -1,0 +1,80 @@
+{{> head }}
+{{> header }}
+<header class="page-head container composer-head">
+  <nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a><span aria-hidden="true">/</span>Compose ton intérieur</nav>
+  <p class="kicker">{{ composer.kicker }}</p>
+  <h1>{{ composer.title }}</h1>
+  <p class="lead">{{ composer.intro }}</p>
+</header>
+
+<section class="composer container" data-composer>
+  <div class="composer__stage">
+    <div class="composer__canvas frame">
+      <canvas data-stage role="img" aria-label="Aperçu de votre composition"></canvas>
+      <div class="loading-veil" data-veil>Préparation de l’atelier…</div>
+    </div>
+    <p class="composer__summary" data-summary aria-live="polite"></p>
+    <div class="composer__actions">
+      <button class="btn" type="button" data-action="send"><svg aria-hidden="true"><use href="#i-arrow"></use></svg>Envoyer comme base de devis</button>
+      <button class="btn btn--ghost" type="button" data-action="save"><svg aria-hidden="true"><use href="#i-save"></use></svg>Enregistrer</button>
+      <button class="btn btn--ghost" type="button" data-action="download"><svg aria-hidden="true"><use href="#i-download"></use></svg>Télécharger l’image</button>
+    </div>
+    <div class="composer__saved" data-saved hidden>
+      <p class="kicker kicker--plain">Mes compositions enregistrées</p>
+      <ul data-saved-list></ul>
+    </div>
+  </div>
+
+  <div class="composer__panel">
+    <div class="composer__step">
+      <h2><span>01</span>La pièce</h2>
+      <div class="decor-picker" role="radiogroup" aria-label="Choisir un décor" data-decors></div>
+    </div>
+
+    <div class="composer__step">
+      <h2><span>02</span>Les rideaux</h2>
+      <div class="fabric-filter" role="group" aria-label="Filtrer par style" data-curtain-styles></div>
+      <div class="fabric-picker" role="radiogroup" aria-label="Choisir le tissu des rideaux" data-picker="curtain"></div>
+      <p class="fabric-picked" data-picked="curtain"></p>
+    </div>
+
+    <div class="composer__step">
+      <h2><span>03</span>La pose</h2>
+      <div class="pose-grid">
+        <label class="switch"><input type="checkbox" data-opt="tieback"><span>Embrasses</span></label>
+        <fieldset class="seg"><legend>Fixation</legend>
+          <label><input type="radio" name="mount" value="fenetre" data-opt="mount" checked><span>Au-dessus de la fenêtre</span></label>
+          <label><input type="radio" name="mount" value="plafond" data-opt="mount"><span>Au plafond</span></label>
+        </fieldset>
+        <fieldset class="seg"><legend>Longueur</legend>
+          <label><input type="radio" name="length" value="sol" data-opt="length" checked><span>Jusqu’au sol</span></label>
+          <label><input type="radio" name="length" value="allege" data-opt="length"><span>À l’appui de fenêtre</span></label>
+        </fieldset>
+        <fieldset class="seg"><legend>Rail</legend>
+          <label><input type="radio" name="rail" value="apparent" data-opt="rail" checked><span>Tringle apparente</span></label>
+          <label><input type="radio" name="rail" value="cache" data-opt="rail"><span>Rail discret</span></label>
+        </fieldset>
+        <fieldset class="seg"><legend>Panneaux</legend>
+          <label><input type="radio" name="panels" value="2" data-opt="panels" checked><span>Une paire</span></label>
+          <label><input type="radio" name="panels" value="1" data-opt="panels"><span>Un seul</span></label>
+        </fieldset>
+        <fieldset class="seg"><legend>Finition de tringle</legend>
+          <label><input type="radio" name="hardware" value="brass" data-opt="hardware" checked><span>Laiton</span></label>
+          <label><input type="radio" name="hardware" value="black" data-opt="hardware"><span>Noir</span></label>
+          <label><input type="radio" name="hardware" value="wood" data-opt="hardware"><span>Bois</span></label>
+          <label><input type="radio" name="hardware" value="white" data-opt="hardware"><span>Blanc</span></label>
+        </fieldset>
+        <label class="range"><span>Ouverture</span><input type="range" min="0" max="100" value="30" data-opt="openness" aria-label="Ouverture des rideaux"></label>
+      </div>
+    </div>
+
+    <div class="composer__step" data-textiles-step>
+      <h2><span>04</span>Coussins &amp; linge de maison</h2>
+      <p class="form__note">Assortissez les textiles de la pièce pour un relooking complet.</p>
+      <button class="chip" type="button" data-action="match">Assortir automatiquement</button>
+      <div data-textile-slots></div>
+    </div>
+  </div>
+</section>
+<script type="application/json" id="page-data">{{{ pageData }}}</script>
+{{> footer }}

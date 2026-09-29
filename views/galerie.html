@@ -1,0 +1,71 @@
+{{> head }}
+{{> header }}
+<div class="expo" data-expo>
+  <nav class="frise" aria-label="Salles de l’exposition" data-frise>
+    <a class="frise__item is-active" href="#entree" data-frise-link="entree"><span class="frise__num">·</span><span class="frise__name">Entrée</span></a>
+    {{#each styles as s}}<a class="frise__item" href="#salle-{{ s.id }}" data-frise-link="salle-{{ s.id }}"><span class="frise__num">{{ s.roman }}</span><span class="frise__name">{{ s.short }}</span></a>{{/each}}
+    <span class="frise__progress" aria-hidden="true"><span data-frise-progress></span></span>
+  </nav>
+
+  <section class="expo-hall" id="entree" data-room="entree">
+    <div class="container expo-hall__inner">
+      <p class="kicker" data-reveal>{{ galerie.introKicker }}</p>
+      <h1 data-reveal>{{ galerie.introTitle }}</h1>
+      <p class="lead" data-reveal>{{ galerie.introText }}</p>
+      <ol class="expo-plan" data-reveal>
+        {{#each styles as s}}<li><a href="#salle-{{ s.id }}"><span>{{ s.roman }}</span>{{ s.short }}</a></li>{{/each}}
+      </ol>
+      <a class="btn" href="#salle-{{#each styles as s}}{{#if @first}}{{ s.id }}{{/if}}{{/each}}" data-reveal>Commencer la visite</a>
+      <p class="expo-hall__hint" data-reveal>Survolez ou touchez les tissus : ils bougent, se laissent observer à la loupe et révèlent leur lumière.</p>
+    </div>
+  </section>
+
+  {{#each styles as s}}
+  <section class="salle{{#if s.alt}} salle--alt{{/if}}" id="salle-{{ s.id }}" data-room="salle-{{ s.id }}" data-salle="{{ s.id }}" aria-labelledby="titre-{{ s.id }}">
+    <div class="container salle__inner">
+      <div class="salle__oeuvre">
+        <div class="salle__frame" data-salle-frame>
+          <canvas class="salle__canvas" data-layer="apres" role="img" aria-label="{{ s.name }} : rideau {{#if s.featured}}{{ s.featured.name }}{{/if}} dans son décor"></canvas>
+          <canvas class="salle__canvas salle__canvas--avant" data-layer="avant" aria-hidden="true" hidden></canvas>
+          <div class="compare" data-compare hidden>
+            <span class="compare__label compare__label--l">Avant · plein jour</span>
+            <span class="compare__label compare__label--r">Après · lumière tamisée</span>
+            <input class="compare__range" type="range" min="0" max="100" value="50" aria-label="Comparer avant et après" data-compare-range>
+            <span class="compare__handle" aria-hidden="true" data-compare-handle></span>
+          </div>
+          <div class="loupe" data-loupe hidden aria-hidden="true"></div>
+          <div class="loading-veil" data-veil>Installation de l’œuvre…</div>
+        </div>
+        <div class="salle__tools" role="group" aria-label="Interagir avec l’œuvre">
+          <button class="tool" type="button" data-tool="wind" aria-pressed="false"><svg aria-hidden="true"><use href="#i-wind"></use></svg>Effleurer</button>
+          <button class="tool" type="button" data-tool="loupe" aria-pressed="false"><svg aria-hidden="true"><use href="#i-loupe"></use></svg>Loupe</button>
+          <button class="tool" type="button" data-tool="light" aria-pressed="false"><svg aria-hidden="true"><use href="#i-sun"></use></svg>Avant / après lumière</button>
+        </div>
+      </div>
+      <aside class="cartel" data-reveal>
+        <p class="cartel__salle">Salle {{ s.roman }}</p>
+        <h2 id="titre-{{ s.id }}">{{ s.name }}</h2>
+        <p class="cartel__text">{{ s.cartel }}</p>
+        <dl class="cartel__facts">
+          <dt>Matière</dt><dd>{{ s.material }}</dd>
+          <dt>Ambiance</dt><dd>{{ s.ambiance }}</dd>
+          {{#if s.featured}}<dt>Pièce exposée</dt><dd><a href="/catalogue/{{ s.featured.slug }}">{{ s.featured.name }}</a></dd>{{/if}}
+        </dl>
+        <a class="btn" href="/catalogue?style={{ s.id }}">Voir les modèles disponibles dans ce style</a>
+        <p class="cartel__count">{{ s.countLabel }}</p>
+      </aside>
+    </div>
+  </section>
+  {{/each}}
+
+  <section class="section section--wash cta-band" data-room="sortie">
+    <div class="container" data-reveal>
+      <p class="kicker" style="justify-content:center">Fin de la visite</p>
+      <h2>{{ galerie.outroTitle }}</h2>
+      <p class="lead" style="margin-inline:auto">{{ galerie.outroText }}</p>
+      <div class="btn-row"><a class="btn" href="/catalogue">Voir le catalogue</a><a class="btn btn--ghost" href="/composer">Compose ton intérieur</a></div>
+    </div>
+  </section>
+</div>
+<script type="application/json" id="page-data">{{{ pageData }}}</script>
+{{> footer }}

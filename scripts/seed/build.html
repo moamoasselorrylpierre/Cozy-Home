@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Génération des visuels de démonstration</title>
+<link rel="stylesheet" href="/public/css/fonts.css">
+<style>body{font-family:'Cormorant Garamond',serif}</style></head>
+<body><p style="font-style:italic">Cozy Home · génération…</p>
+<script type="module">
+// Page pilotée par scripts/build-assets.mjs (Chromium sans affichage).
+import { FABRICS } from '/scripts/seed/fabric-patterns.js';
+import { renderPresentoir, PRESENTOIR_STATES } from '/public/js/modules/curtain-render.js';
+import { analyzeFabric } from '/public/js/modules/fabric-analysis.js';
+import { SceneRenderer, curtainFromModel } from '/public/js/modules/curtain-scene.js';
+
+const tiles = new Map();
+function tile(id) {
+  if (!tiles.has(id)) {
+    const f = FABRICS.find((x) => x.id === id);
+    if (!f) throw new Error(`Tissu inconnu : ${id}`);
+    const c = document.createElement('canvas');
+    c.width = c.height = 512;
+    f.draw(c.getContext('2d', { willReadFrequently: true }), 512);
+    tiles.set(id, c);
+  }
+  return tiles.get(id);
+}
+
+// « Photo » d'échantillon : carré de tissu aux bords crantés posé sur une table en lin.
+function sample(t) {
+  const S = 900;
+  const c = document.createElement('canvas');
+  c.width = c.height = S;
+  const ctx = c.getContext('2d');
+  const bg = ctx.createLinearGradient(0, 0, S, S);
+  bg.addColorStop(0, '#EFE8DC');
+  bg.addColorStop(1, '#E2D7C5');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, S, S);
+  for (let i = 0; i < 9000; i++) {
+    ctx.fillStyle = `rgba(90,70,50,${Math.random() * 0.05})`;
+    ctx.fillRect(Math.random() * S, Math.random() * S, 1, 1 + Math.random() * 2);
+  }
+  const side = 640;
+  const path = new Path2D();
+  const teeth = 46;
+  const step = side / teeth;
+  const z = 7;
+  const x0 = -side / 2;
+  const y0 = -side / 2;
+  path.moveTo(x0, y0);
+  for (let i = 0; i < teeth; i++) { path.lineTo(x0 + (i + 0.5) * step, y0 - z); path.lineTo(x0 + (i + 1) * step, y0); }
+  for (let i = 0; i < teeth; i++) { path.lineTo(x0 + side + z, y0 + (i + 0.5) * step); path.lineTo(x0 + side, y0 + (i + 1) * step); }
+  for (let i = 0; i < teeth; i++) { path.lineTo(x0 + side - (i + 0.5) * step, y0 + side + z); path.lineTo(x0 + side - (i + 1) * step, y0 + side); }
+  for (let i = 0; i < teeth; i++) { path.lineTo(x0 - z, y0 + side - (i + 0.5) * step); path.lineTo(x0, y0 + side - (i + 1) * step); }
+  path.closePath();
+  ctx.save();
+  ctx.translate(S / 2, S / 2);
+  ctx.rotate(-0.06);
+  ctx.shadowColor = 'rgba(60,45,30,0.35)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 14;
+  ctx.fillStyle = '#ccc';
+  ctx.fill(path);
+  ctx.shadowColor = 'transparent';
+  ctx.clip(path);
+  const pat = ctx.createPattern(t, 'repeat');
+  pat.setTransform(new DOMMatrix().translate(x0, y0).scale(side / 512 * 0.9));
+  ctx.fillStyle = pat;
+  ctx.fillRect(x0 - 20, y0 - 20, side + 40, side + 40);
+  const light = ctx.createLinearGradient(x0, y0, x0 + side, y0 + side);
+  light.addColorStop(0, 'rgba(255,255,255,0.14)');
+  light.addColorStop(0.6, 'rgba(255,255,255,0)');
+  light.addColorStop(1, 'rgba(0,0,0,0.1)');
+  ctx.fillStyle = light;
+  ctx.fillRect(x0 - 20, y0 - 20, side + 40, side + 40);
+  ctx.restore();
+  return c;
+}
+
+const webp = (c, q = 0.86) => c.toDataURL('image/webp', q);
+
+window.fabricIds = FABRICS.map((f) => f.id);
+
+window.buildFabric = (id) => {
+  const t = tile(id);
+  return { tile: webp(t, 0.9), sample: webp(sample(t), 0.86), analysis: analyzeFabric(t) };
+};
+
+window.buildMockups = async (id, render) => {
+  await document.fonts.ready;
+  const out = {};
+  for (const { key } of PRESENTOIR_STATES) {
+    const c = document.createElement('canvas');
+    c.width = 900;
+    c.height = 1125;
+    renderPresentoir(c, { texture: tile(id), ...render }, key);
+    out[key] = webp(c, 0.84);
+  }
+  return out;
+};
+
+// Scène recadrée (visuels du site) : { decor, curtain: {id, render}, textiles: {slot: id}, pose, width, height }
+window.buildScene = async ({ decor, curtain, textiles = {}, pose = {}, width, height, focus = 'window' }) => {
+  await document.fonts.ready;
+  const sceneW = Math.max(width, Math.round(height * 1.6));
+  const canvas = document.createElement('canvas');
+  canvas.width = sceneW;
+  canvas.height = Math.round(sceneW / 1.6);
+  const r = new SceneRenderer(canvas);
+  const model = curtain ? { render: curtain.render } : null;
+  r.render({
+    decor,
+    curtain: model ? curtainFromModel(model, tile(curtain.id)) : null,
+    pose: { panels: 2, mount: 'fenetre', length: 'sol', rail: 'apparent', openness: 0.3, ...pose },
+    textiles: Object.fromEntries(Object.entries(textiles).map(([k, v]) => [k, v ? tile(v) : null])),
+    light: 'jour',
+  });
+  const out = document.createElement('canvas');
+  out.width = width;
+  out.height = height;
+  const k = canvas.width / 1600;
+  const win = r.spec?.window;
+  const cx = focus === 'window' && win ? (win.x + win.w / 2) * k : canvas.width / 2;
+  const sx = Math.max(0, Math.min(canvas.width - width, cx - width / 2));
+  const sy = Math.max(0, Math.min(canvas.height - height, (canvas.height - height) / 2));
+  out.getContext('2d').drawImage(canvas, sx, sy, width, height, 0, 0, width, height);
+  return webp(out, 0.85);
+};
+
+window.ready = true;
+</script>
+</body></html>

@@ -1,0 +1,61 @@
+{{> head }}
+{{> header }}
+<header class="page-head container">
+  <nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a><span aria-hidden="true">/</span>Catalogue</nav>
+  <p class="kicker" data-reveal>{{ catalogue.kicker }}</p>
+  <h1 data-reveal>{{ catalogue.title }}</h1>
+  <p class="lead" data-reveal>{{ catalogue.intro }}</p>
+</header>
+
+<div class="filters" data-filters>
+  <div class="container filters__bar" role="toolbar" aria-label="Filtrer les modèles">
+    <div class="filters__group">
+      <span class="filters__label">Style</span>
+      <button class="chip" type="button" data-filter="style" data-value="" aria-pressed="true">Tous</button>
+      {{#each filters.styles as s}}<button class="chip" type="button" data-filter="style" data-value="{{ s.id }}" aria-pressed="false">{{ s.label }}</button>{{/each}}
+    </div>
+    <span class="filters__sep" aria-hidden="true"></span>
+    <div class="filters__group">
+      <span class="filters__label">Couleur</span>
+      {{#each filters.families as f}}<button class="chip" type="button" data-filter="couleur" data-value="{{ f.id }}" aria-pressed="false" title="{{ f.label }}"><i style="background:{{ f.swatch }}"></i>{{ f.label }}</button>{{/each}}
+    </div>
+    <span class="filters__sep" aria-hidden="true"></span>
+    <div class="filters__group">
+      <label class="filters__label" for="f-matiere">Matière</label>
+      <select id="f-matiere" data-filter-select="matiere"><option value="">Toutes</option>{{#each filters.materials as m}}<option value="{{ m.id }}">{{ m.label }}</option>{{/each}}</select>
+      <label class="filters__label" for="f-piece" style="margin-left:10px">Pièce</label>
+      <select id="f-piece" data-filter-select="piece"><option value="">Toutes</option>{{#each filters.rooms as r}}<option value="{{ r.id }}">{{ r.label }}</option>{{/each}}</select>
+    </div>
+    <button class="chip chip--reset" type="button" data-filter-reset hidden>Effacer</button>
+    <span class="filters__count" data-count aria-live="polite">{{ models.length }} modèles</span>
+  </div>
+</div>
+
+<section class="container" style="padding-bottom:var(--section)">
+  <div class="model-grid" data-grid>
+    {{#each models as m}}
+    <a class="model-card{{#if m.unavailable}} is-epuise{{/if}}" href="/catalogue/{{ m.slug }}" data-palette="{{ m.palette }}"
+       data-style="{{ m.style }}" data-material="{{ m.material }}" data-rooms="{{#each m.rooms as r}}{{ r }} {{/each}}" data-families="{{#each m.colorFamilies as f}}{{ f }} {{/each}}">
+      <div class="model-card__media">
+        <span class="model-card__badge">{{ m.availabilityLabel }}</span>
+        <img src="{{ m.cover }}" alt="Rideau {{ m.name }}, {{ m.styleName }}, monté et drapé sur tringle" loading="lazy" decoding="async" width="900" height="1125">
+        {{#if m.images.mockups.embrasse}}<img class="is-alt" src="{{ m.images.mockups.embrasse }}" alt="" loading="lazy" decoding="async" width="900" height="1125">{{/if}}
+        <span class="model-card__swatch" style="background-image:url('{{ m.images.swatch }}')" aria-hidden="true"></span>
+      </div>
+      <div class="model-card__body">
+        <span class="model-card__style">{{ m.styleName }} · {{ m.materialLabel }}</span>
+        <h2 class="model-card__name">{{ m.name }}</h2>
+        <p class="model-card__meta" style="margin:0"><span>{{ m.priceLabel }}</span><span class="swatches">{{#each m.colors as c}}<i style="background:{{ c.hex }}" title="{{ c.name }}"></i>{{/each}}</span></p>
+        <span class="model-card__line"></span>
+      </div>
+    </a>
+    {{/each}}
+  </div>
+  <div class="empty-state" data-empty hidden>
+    <h3>Aucun modèle ne correspond… pour l’instant.</h3>
+    <p>Fany peut rechercher le tissu de vos rêves : décrivez-le-lui.</p>
+    <div class="btn-row" style="justify-content:center"><button class="btn btn--ghost" type="button" data-filter-reset>Effacer les filtres</button><a class="btn" href="/contact?demande=conseil">Demander conseil</a></div>
+  </div>
+</section>
+<script type="application/json" id="page-data">{{{ pageData }}}</script>
+{{> footer }}
