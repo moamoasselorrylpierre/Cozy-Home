@@ -1,4 +1,4 @@
-// Tests d'intégration du Worker (wrangler dev, D1 et R2 locaux) : pages, API, sécurité de l'espace pro.
+// Tests d'intégration du Worker (wrangler dev, D1 locale) : pages, API, sécurité de l'espace pro.
 // Lancement : npm test
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -128,9 +128,18 @@ test('espace admin : connexion, modèles, archivage, contenus, demandes', async 
   assert.equal(served.status, 200);
   assert.equal(served.headers.get('content-type'), 'image/png');
   assert.match(served.headers.get('cache-control'), /immutable/);
+  assert.deepEqual(Buffer.from(await served.arrayBuffer()), Buffer.from(PNG_BYTES));
+  // Image de taille réelle (≈ 300 Ko) : restituée à l'octet près.
+  const big = new Uint8Array(300 * 1024).map(() => Math.floor(Math.random() * 256));
+  big.set([0x52, 0x49, 0x46, 0x46, 0, 0, 0, 0, 0x57, 0x45, 0x42, 0x50]);
+  const bigUp = await uploadBytes(big, 'image/webp', 'contenus');
+  assert.equal(bigUp.status, 201);
+  const bigServed = await fetch(base + bigUp.json.url);
+  assert.equal(bigServed.headers.get('content-type'), 'image/webp');
+  assert.ok(Buffer.from(await bigServed.arrayBuffer()).equals(Buffer.from(big)));
   const fake = await uploadBytes(Buffer.from('<svg onload=alert(1)>'), 'image/png');
   assert.equal(fake.status, 400);
-  const tooBig = await uploadBytes(new Uint8Array(3 * 1024 * 1024 + 10), 'image/webp');
+  const tooBig = await uploadBytes(new Uint8Array(1400 * 1024 + 10), 'image/webp');
   assert.equal(tooBig.status, 413);
 
   // Un modèle publié exige une photo de tissu.

@@ -1,8 +1,12 @@
-// Images téléversées : stockées dans Cloudflare R2, servies depuis /uploads/… avec un cache
+// Images téléversées : stockées dans la base D1 (aucune activation requise) ou, si la liaison
+// « MEDIA » est configurée, dans Cloudflare R2. Servies depuis /uploads/… avec un cache
 // navigateur et CDN d'un an (chaque fichier a un nom unique, il ne change jamais).
 import { HttpError } from './http.js';
+import { ensureDb } from './db.js';
 
-export const MAX_UPLOAD_BYTES = 3 * 1024 * 1024; // les images sont compressées dans le navigateur avant l'envoi
+// Les images sont compressées dans le navigateur avant l'envoi (≤ 230 Ko en pratique).
+// Plafond compatible avec D1 (2 Mo par ligne, images stockées en base64).
+export const MAX_UPLOAD_BYTES = 1400 * 1024;
 export const MAX_COMPOSITION_BYTES = 900 * 1024;
 
 const SIGNATURES = [
@@ -18,16 +22,35 @@ function sniff(bytes) {
   return sig;
 }
 
-/** Enregistre une image (octets) dans R2 et renvoie son URL publique /uploads/… */
-export async function saveImage(bucket, bytes, folder, maxBytes = MAX_UPLOAD_BYTES) {
-  if (!bucket) throw new HttpError(500, 'Stockage des images non configuré (liaison R2 « MEDIA »).');
+function toBase64(bytes) {
+  if (typeof bytes.toBase64 === 'function') return bytes.toBase64();
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+
+function fromBase64(text) {
+  if (typeof Uint8Array.fromBase64 === 'function') return Uint8Array.fromBase64(text);
+  const bin = atob(text);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+/** Enregistre une image (octets) dans R2 ou D1 et renvoie son URL publique /uploads/… */
+export async function saveImage(env, bytes, folder, maxBytes = MAX_UPLOAD_BYTES) {
   if (!bytes?.length) throw new HttpError(400, 'Image vide.');
   if (bytes.length > maxBytes) throw new HttpError(413, 'Image trop volumineuse.');
   const sig = sniff(bytes);
   const dir = FOLDERS.includes(folder) ? folder : 'contenus';
   const rand = [...crypto.getRandomValues(new Uint8Array(10))].map((b) => b.toString(16).padStart(2, '0')).join('');
   const key = `${dir}/${new Date().toISOString().slice(0, 7)}/${rand}.${sig.ext}`;
-  await bucket.put(key, bytes, { httpMetadata: { contentType: sig.type, cacheControl: 'public, max-age=31536000, immutable' } });
+  if (env.MEDIA) {
+    await env.MEDIA.put(key, bytes, { httpMetadata: { contentType: sig.type, cacheControl: 'public, max-age=31536000, immutable' } });
+  } else {
+    await env.DB.prepare('INSERT INTO media (key, type, size, data, created) VALUES (?, ?, ?, ?, ?)')
+      .bind(key, sig.type, bytes.length, toBase64(bytes), Date.now()).run();
+  }
   return `/uploads/${key}`;
 }
 
@@ -41,21 +64,31 @@ export function bytesFromDataUrl(dataUrl) {
   return bytes;
 }
 
-/** Sert une image de R2, en s'appuyant sur le cache de Cloudflare. */
+/** Lit une image : R2 d'abord (si configuré), puis D1. */
+async function loadImage(env, key) {
+  const obj = await env.MEDIA?.get(key);
+  if (obj) return { body: obj.body, type: obj.httpMetadata?.contentType, etag: obj.httpEtag };
+  await ensureDb(env.DB);
+  const row = await env.DB.prepare('SELECT type, data FROM media WHERE key = ?').bind(key).first();
+  return row ? { body: fromBase64(row.data), type: row.type } : null;
+}
+
+/** Sert une image téléversée, en s'appuyant sur le cache de Cloudflare. */
 export async function serveUpload(request, env, ctx, key) {
   if (!/^[a-z]+\/\d{4}-\d{2}\/[a-f0-9]{20}\.(webp|jpg|png)$/.test(key)) throw new HttpError(404, 'Fichier introuvable.');
   const cache = caches.default;
   const cacheKey = new Request(new URL(request.url).toString(), { method: 'GET' });
   const cached = await cache.match(cacheKey);
   if (cached) return cached;
-  const obj = await env.MEDIA?.get(key);
-  if (!obj) throw new HttpError(404, 'Fichier introuvable.');
-  const headers = new Headers();
-  obj.writeHttpMetadata(headers);
-  headers.set('Cache-Control', 'public, max-age=31536000, immutable');
-  headers.set('ETag', obj.httpEtag);
-  headers.set('X-Content-Type-Options', 'nosniff');
-  const response = new Response(obj.body, { headers });
+  const image = await loadImage(env, key);
+  if (!image) throw new HttpError(404, 'Fichier introuvable.');
+  const headers = new Headers({
+    'Content-Type': image.type || 'application/octet-stream',
+    'Cache-Control': 'public, max-age=31536000, immutable',
+    'X-Content-Type-Options': 'nosniff',
+  });
+  if (image.etag) headers.set('ETag', image.etag);
+  const response = new Response(image.body, { headers });
   ctx.waitUntil(cache.put(cacheKey, response.clone()));
   return response;
 }

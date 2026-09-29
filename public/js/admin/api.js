@@ -22,7 +22,7 @@ export async function api(path, { method = 'GET', body } = {}) {
   return data;
 }
 
-/** Téléverse une image déjà compressée (Blob) vers le stockage R2 ; renvoie son adresse. */
+/** Téléverse une image déjà compressée (Blob) vers le stockage Cloudflare ; renvoie son adresse. */
 export async function upload(blob, folder) {
   const res = await fetch(`/api/admin/uploads?folder=${encodeURIComponent(folder)}`, {
     method: 'POST',

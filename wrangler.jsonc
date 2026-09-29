@@ -1,6 +1,8 @@
 {
   // Configuration Cloudflare Workers de Cozy Home by Fany.
-  // D1 (données) et R2 (images) sont créés automatiquement au premier déploiement.
+  // La base D1 (données et images) est créée automatiquement au premier déploiement.
+  // Stockage R2 facultatif (plus d'espace pour les images, nécessite d'activer R2) :
+  // ajouter  "r2_buckets": [ { "binding": "MEDIA" } ]  — voir docs/DEPLOIEMENT-CLOUDFLARE.md.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "cozy-home",
   "main": "server/worker.js",
@@ -12,9 +14,6 @@
   },
   "d1_databases": [
     { "binding": "DB", "database_name": "cozy-home-db" }
-  ],
-  "r2_buckets": [
-    { "binding": "MEDIA" }
   ],
   // Les gabarits HTML sont intégrés au Worker sous forme de texte.
   "rules": [

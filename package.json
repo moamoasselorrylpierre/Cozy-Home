@@ -1,7 +1,7 @@
 {
   "name": "cozy-home-by-fany",
   "version": "1.0.0",
-  "description": "Site vitrine & boutique de Cozy Home by Fany — rideaux sur mesure et relooking d'intérieur (Cloudflare Workers + D1 + R2).",
+  "description": "Site vitrine & boutique de Cozy Home by Fany — rideaux sur mesure et relooking d'intérieur (Cloudflare Workers + D1).",
   "private": true,
   "type": "module",
   "engines": {

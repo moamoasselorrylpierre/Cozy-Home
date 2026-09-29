@@ -15,7 +15,7 @@ async function loadPlaywright() {
   throw new Error('Playwright est requis : npm i -D playwright');
 }
 
-// Site lancé en local dans le moteur Cloudflare (wrangler dev), avec une base D1 et un stockage R2 neufs.
+// Site lancé en local dans le moteur Cloudflare (wrangler dev), avec une base D1 neuve.
 const { startWorker } = await import('../tests/worker.js');
 const worker = await startWorker({ vars: { ADMIN_USER: 'fany', ADMIN_PASSWORD: 'Maquettes-2026' } });
 const base = worker.base;

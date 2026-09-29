@@ -1,4 +1,4 @@
-// Démarre le Worker en local (wrangler dev) sur un port libre, avec une base D1 et un stockage R2 neufs.
+// Démarre le Worker en local (wrangler dev) sur un port libre, avec une base D1 neuve.
 import { spawn } from 'node:child_process';
 import fs from 'node:fs/promises';
 import os from 'node:os';

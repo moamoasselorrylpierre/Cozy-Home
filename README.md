@@ -16,10 +16,10 @@ Un portfolio-boutique interactif en deux espaces :
 |---|---|
 | Pages, espace pro, formulaires | Cloudflare **Workers** |
 | Modèles, textes, demandes, comptes | Cloudflare **D1** (base de données) |
-| Images déposées depuis l’espace pro | Cloudflare **R2** |
+| Images déposées depuis l’espace pro | Cloudflare **D1** (R2 en option) |
 | CSS, scripts, polices, visuels | **Static Assets** |
 
-La base D1 et le stockage R2 sont créés automatiquement au premier déploiement.
+La base D1 est créée automatiquement au premier déploiement (aucune carte bancaire requise).
 👉 Pas à pas : **[docs/DEPLOIEMENT-CLOUDFLARE.md](docs/DEPLOIEMENT-CLOUDFLARE.md)**
 (import du dépôt GitHub depuis le tableau de bord Cloudflare, sans rien installer).
 
@@ -32,7 +32,7 @@ Prérequis : Node.js 20 ou plus récent.
 ```bash
 npm install
 cp .dev.vars.example .dev.vars   # puis renseigner ADMIN_PASSWORD
-npm run dev                      # http://localhost:8787 (D1 et R2 simulés localement)
+npm run dev                      # http://localhost:8787 (D1 simulée localement)
 npm test                         # tests d'intégration sur le Worker local
 npm run deploy                   # déploiement avec Wrangler (compte Cloudflare connecté via « npx wrangler login »)
 npm run build:assets             # régénère les visuels de démonstration (Playwright + Chromium)
