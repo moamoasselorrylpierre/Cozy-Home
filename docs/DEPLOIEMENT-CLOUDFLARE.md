@@ -6,12 +6,12 @@ Tout le site fonctionne sur **votre compte Cloudflare**, sans ordinateur allumé
 |---|---|
 | Pages du site, espace pro, formulaires | **Workers** |
 | Modèles, textes, demandes, comptes | **D1** (base de données) |
-| Images déposées depuis l’espace pro | **R2** (stockage d’images) |
+| Images déposées depuis l’espace pro | **D1** (ou **R2**, facultatif — voir plus bas) |
 | CSS, scripts, polices, visuels du site | **Static Assets** (servis par le réseau Cloudflare) |
 
-La base D1 et le stockage R2 sont **créés automatiquement** au premier déploiement.
+La base D1 est **créée automatiquement** au premier déploiement ; aucune carte bancaire n’est nécessaire.
 L’offre gratuite suffit pour démarrer : 100 000 requêtes par jour pour le Worker, 5 millions de lectures
-et 100 000 écritures par jour pour la base D1 (5 Go), stockage d’images R2 inclus dans le palier gratuit.
+et 100 000 écritures par jour pour la base D1 (500 Mo par base, soit plusieurs centaines de modèles avec leurs images).
 
 > ⚠️ Vérifiez à chaque étape que vous êtes connecté·e à **votre** compte Cloudflare :
 > l’adresse e-mail affichée en haut à droite du tableau de bord doit être la vôtre.
@@ -33,8 +33,8 @@ Fusionnez la pull request dans la branche `main` du dépôt GitHub `Cozy-Home`
    - **Commande de build** : laisser vide ;
    - **Commande de déploiement** : `npx wrangler deploy` (valeur par défaut) ;
    - **Branche de production** : `main`.
-4. Cliquez sur **Enregistrer et déployer**. Cloudflare installe le projet, crée la base **D1** et le
-   stockage **R2**, puis publie le site. Comptez 1 à 3 minutes.
+4. Cliquez sur **Enregistrer et déployer**. Cloudflare installe le projet, crée la base **D1**,
+   puis publie le site. Comptez 1 à 3 minutes.
 
 ### 3. Définir le mot de passe de l’espace pro
 1. Dans **Workers & Pages → cozy-home → Paramètres → Variables et secrets**, cliquez sur **Ajouter**.
@@ -46,7 +46,7 @@ Fusionnez la pull request dans la branche `main` du dépôt GitHub `Cozy-Home`
   (visible sur la page du Worker) : c’est votre **lien provisoire**, déjà en HTTPS.
 - Espace pro : ajoutez `/admin` à l’adresse, identifiant **`fany`**, mot de passe défini à l’étape 3.
 - Vous pouvez aussitôt déposer vos photos depuis n’importe quel appareil (ordinateur, téléphone) :
-  elles sont compressées dans votre navigateur puis enregistrées dans R2.
+  elles sont compressées dans votre navigateur puis enregistrées sur Cloudflare.
 
 ### 5. Brancher votre nom de domaine (quand vous êtes prêt·e)
 1. Le domaine doit être ajouté à votre compte Cloudflare (**Ajouter un domaine**) ou acheté via Cloudflare Registrar.
@@ -58,7 +58,7 @@ Fusionnez la pull request dans la branche `main` du dépôt GitHub `Cozy-Home`
 
 ### Mises à jour du site
 Chaque modification poussée sur la branche `main` redéploie automatiquement le site.
-**Les données (modèles, textes, demandes, images) sont conservées** : elles sont dans D1 et R2, pas dans le code.
+**Les données (modèles, textes, demandes, images) sont conservées** : elles sont dans la base D1, pas dans le code.
 
 ---
 
@@ -72,7 +72,7 @@ cd Cozy-Home
 npm install
 npx wrangler login            # ouvre le navigateur : connectez-vous à VOTRE compte Cloudflare
 npx wrangler whoami           # vérifie le compte utilisé
-npx wrangler deploy           # crée D1 + R2 et publie le site
+npx wrangler deploy           # crée la base D1 et publie le site
 npx wrangler secret put ADMIN_PASSWORD
 ```
 
@@ -110,4 +110,14 @@ déposées sont mises en cache un an par le réseau Cloudflare.
 ## Sauvegarde
 - Base de données : **Stockage et bases de données → D1 → cozy-home-db → Time Travel** (restauration à un instant donné ;
   durée de conservation selon votre offre), ou export complet : `npx wrangler d1 export cozy-home-db --remote --output sauvegarde.sql`.
-- Images : visibles dans **R2** (compartiment créé pour `cozy-home`).
+- Les images déposées sont incluses dans la base D1 (table `media`), donc dans ces sauvegardes.
+
+## En cas d’échec du déploiement
+Ouvrez le build en échec (**Workers & Pages → cozy-home → Déploiements → Afficher le build**) et descendez
+**tout en bas** du journal « Deploying » : la ligne rouge `✘ [ERROR] …` indique la cause, puis **Réessayer le build**.
+
+## Option : stockage R2 pour les images
+Utile seulement si la base approche 500 Mo. R2 doit d’abord être activé sur le compte
+(**Stockage et bases de données → R2 → Activer**, un moyen de paiement est demandé même pour l’offre gratuite).
+Ajoutez ensuite dans `wrangler.jsonc` : `"r2_buckets": [ { "binding": "MEDIA" } ]`.
+Les nouvelles images iront dans R2 ; celles déjà déposées restent servies depuis D1.

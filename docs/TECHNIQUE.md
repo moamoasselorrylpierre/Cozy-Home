@@ -5,10 +5,12 @@
 - **Cloudflare Workers** : pages publiques rendues côté serveur (SEO), API JSON, service des images.
   Aucune dépendance d’exécution ; le Worker est assemblé par Wrangler (`wrangler.jsonc`).
 - **D1** (SQLite) : une table `docs` (collection, identifiant, document JSON) pour les modèles, salles, contenus,
-  demandes, comptes et sessions ; une table `hits` pour la limitation des abus. Schéma et données de démonstration
+  demandes, comptes et sessions ; une table `hits` pour la limitation des abus ; une table `media` pour les images
+  téléversées (base64, ≤ 1,4 Mo chacune). Schéma et données de démonstration
   créés automatiquement au premier appel. Cache mémoire de 10 s pour les lectures publiques.
-- **R2** : images déposées depuis l’espace pro et captures de compositions, servies sous `/uploads/…`
-  avec un cache d’un an (noms uniques).
+- **Images déposées** (espace pro, captures de compositions) : table `media` de D1 par défaut, ou **R2** si la
+  liaison `MEDIA` est ajoutée (facultatif). Servies sous `/uploads/…` avec un cache d’un an (noms uniques) ;
+  lecture R2 puis D1, les anciennes images restent donc disponibles après un passage à R2.
 - **Static Assets** : `public/` (CSS, JS, polices, visuels de démonstration) servi directement par Cloudflare ;
   en-têtes de cache dans `public/_headers`.
 - **Navigateur** : JavaScript moderne en modules ES, sans framework ni compilation. Les modules lourds (décors,
@@ -17,10 +19,10 @@
 ```
 server/
   worker.js         point d'entrée Cloudflare
-  app.js            routage, images R2, erreurs
+  app.js            routage, images téléversées, erreurs
   db.js             D1 : schéma, données initiales, lecture/écriture, compteurs, cache mémoire
   auth.js           comptes (PBKDF2 Web Crypto), sessions, secrets ADMIN_PASSWORD / ADMIN_PASSWORD_RESET
-  media.js          images R2 : vérification de signature, stockage, service avec cache
+  media.js          images : vérification de signature, stockage D1 (ou R2), service avec cache
   domain.js         validation / nettoyage des modèles, contenus, demandes
   api-public.js     catalogue, styles, réception des demandes
   api-admin.js      API de l'espace pro (session + anti-CSRF)
@@ -35,7 +37,7 @@ public/             fichiers statiques (+ _headers)
 scripts/            build-assets.mjs (visuels de démo), maquettes.mjs (captures)
 seed/               données initiales (modèles de démonstration, salles, contenus)
 tests/              tests d'intégration (node --test contre « wrangler dev »)
-wrangler.jsonc      configuration Cloudflare (D1, R2, assets)
+wrangler.jsonc      configuration Cloudflare (D1, assets, R2 facultatif)
 ```
 
 ## Modules indépendants
@@ -102,7 +104,7 @@ Les deux expériences signature sont isolées pour pouvoir être ajustées ou re
 
 ## Performance
 
-- Images compressées dans le navigateur **avant l’envoi** vers R2, avec un poids maximal par usage (voir docs/DEPLOIEMENT-CLOUDFLARE.md) ;
+- Images compressées dans le navigateur **avant l’envoi** vers Cloudflare, avec un poids maximal par usage (voir docs/DEPLOIEMENT-CLOUDFLARE.md) ;
   versions 480 px pour mobiles (`srcset`), `loading="lazy"`, dimensions déclarées, cache d’un an sur le réseau Cloudflare.
 - Polices auto-hébergées (WOFF2, préchargées), aucune requête tierce au chargement.
 - Modules de rendu chargés à la demande (IntersectionObserver) ; vignettes des décors dessinées pendant les temps morts.

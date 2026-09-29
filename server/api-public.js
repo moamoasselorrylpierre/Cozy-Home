@@ -37,7 +37,7 @@ export function registerPublicApi(router) {
     const clean = sanitizeRequest(body);
     const composition = sanitizeComposition(body.composition);
     if (composition && body.composition?.snapshot) {
-      composition.snapshot = await saveImage(c.env.MEDIA, bytesFromDataUrl(body.composition.snapshot), 'compositions', MAX_COMPOSITION_BYTES);
+      composition.snapshot = await saveImage(c.env, bytesFromDataUrl(body.composition.snapshot), 'compositions', MAX_COMPOSITION_BYTES);
     }
     if (clean.details.modelSlug) {
       const model = (await all(c.db, 'models')).find((m) => m.slug === clean.details.modelSlug);

@@ -111,7 +111,7 @@ la matière, l’ambiance, la **pièce exposée** (un modèle publié de ce styl
 
 ## 9. Bonnes pratiques
 
-- Les données sont sur Cloudflare (base D1 et stockage R2) : aucune machine n’a besoin d’être allumée.
+- Les données sont sur Cloudflare (base D1) : aucune machine n’a besoin d’être allumée.
   Pensez à exporter régulièrement la base (voir docs/DEPLOIEMENT-CLOUDFLARE.md, « Sauvegarde »).
 - Les 16 tissus fournis au lancement sont des **exemples de démonstration** : remplacez-les par vos créations
   (archivez-les ou supprimez-les au fur et à mesure) et vérifiez les prix.

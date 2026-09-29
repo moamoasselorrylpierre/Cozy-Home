@@ -1,4 +1,4 @@
-// Assemblage de l'application Worker : routes, images R2, gestion des erreurs.
+// Assemblage de l'application Worker : routes, images téléversées, gestion des erreurs.
 // Les fichiers statiques (css, js, img, fonts…) sont servis directement par Cloudflare (Workers Static Assets).
 import { Router } from './router.js';
 import { json, html, HttpError } from './http.js';

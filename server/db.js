@@ -1,5 +1,6 @@
 // Stockage sur Cloudflare D1 (SQLite) : une table de documents JSON par « collection »
-// (models, styles, requests, users, sessions, content) + une table de compteurs anti-abus.
+// (models, styles, requests, users, sessions, content), une table de compteurs anti-abus
+// et une table d'images téléversées (media, voir media.js).
 // Le schéma et les données initiales sont créés automatiquement au premier appel.
 import seedModels from '../seed/models.json';
 import seedStyles from '../seed/styles.json';
@@ -9,6 +10,7 @@ const SCHEMA = [
   'CREATE TABLE IF NOT EXISTS docs (col TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, updated INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (col, id))',
   'CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)',
   'CREATE TABLE IF NOT EXISTS hits (key TEXT PRIMARY KEY, start INTEGER NOT NULL, count INTEGER NOT NULL)',
+  'CREATE TABLE IF NOT EXISTS media (key TEXT PRIMARY KEY, type TEXT NOT NULL, size INTEGER NOT NULL, data TEXT NOT NULL, created INTEGER NOT NULL)',
 ];
 const SEED_VERSION = '1';
 

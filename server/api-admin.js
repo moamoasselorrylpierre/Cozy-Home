@@ -123,7 +123,7 @@ export function registerAdminApi(router) {
   // --- Téléversement d'images (déjà compressées par le navigateur) → R2 ---
   router.post('/api/admin/uploads', guard(async (c) => {
     const bytes = await readBytes(c.req, MAX_UPLOAD_BYTES);
-    const url = await saveImage(c.env.MEDIA, bytes, c.query.get('folder') || 'contenus');
+    const url = await saveImage(c.env, bytes, c.query.get('folder') || 'contenus');
     return json({ url, bytes: bytes.length }, 201);
   }));
 
